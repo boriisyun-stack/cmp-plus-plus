@@ -2,6 +2,7 @@
 main
 snake
 badapple
+badapple_ascii
 a.out
 *.exe
 *.o
@@ -12,7 +13,7 @@ a.out
 main.cpp
 snake.cpp
 badapple.cpp
-badapple_ocv.cpp
+badapple_ascii.cpp
 playground_code.js
 
 # OS files

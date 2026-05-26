@@ -1,0 +1,367 @@
+#i io
+#i vec
+#i str
+#i math
+#i thr
+#i chr
+#i cstd
+
+st Prt {
+    fl x
+    fl y
+    fl vx
+    fl vy
+    fl speed
+    fl size
+    fl alpha
+}
+
+st Shd {
+    fl x
+    fl y
+    fl vx
+    fl vy
+    fl angle
+    fl rotSpeed
+    fl size
+}
+
+st Ptl {
+    fl x
+    fl y
+    fl speed
+    fl angle
+    fl waveSpeed
+    fl size
+}
+
+const it sW = 70
+const it sH = 30
+ch buf[30][70]
+ch bgCh = ' '
+
+vd cls() {
+    ⟳ (it y = 0; y < sH; y++) {
+        ⟳ (it x = 0; x < sW; x++) {
+            buf[y][x] = bgCh
+        }
+    }
+}
+
+vd circ(fl cx, fl cy, fl r, ch c) {
+    ⟳ (it y = 0; y < sH; y++) {
+        ⟳ (it x = 0; x < sW; x++) {
+            ? ((x - cx)*(x - cx) + (y - cy)*(y - cy)*2.1f < r*r) {
+                buf[y][x] = c
+            }
+        }
+    }
+}
+
+vd rect(fl rx, fl ry, fl rw, fl rh, ch c) {
+    ⟳ (it y = 0; y < sH; y++) {
+        ⟳ (it x = 0; x < sW; x++) {
+            ? (x >= rx && x < rx + rw && y >= ry && y < ry + rh) {
+                buf[y][x] = c
+            }
+        }
+    }
+}
+
+vd line(fl x1, fl y1, fl x2, fl y2, ch c) {
+    fl dx = x2 - x1
+    fl dy = y2 - y1
+    fl steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy)
+    ? (steps == 0.0f) { →; }
+    fl xI = dx / steps
+    fl yI = dy / steps
+    fl x = x1
+    fl y = y1
+    ⟳ (it i = 0; i <= sc<it>(steps); i++) {
+        it ix = sc<it>(x)
+        it iy = sc<it>(y)
+        ? (ix >= 0 && ix < sW && iy >= 0 && iy < sH) {
+            buf[iy][ix] = c
+        }
+        x += xI
+        y += yI
+    }
+}
+
+vd tri(fl x1, fl y1, fl x2, fl y2, fl x3, fl y3, ch c) {
+    line(x1, y1, x2, y2, c)
+    line(x2, y2, x3, y3, c)
+    line(x3, y3, x1, y1, c)
+}
+
+vd text(str t, it x, it y, ch c) {
+    ⟳ (it i = 0; i < sc<it>(t.length()); i++) {
+        ? (x + i >= 0 && x + i < sW && y >= 0 && y < sH) {
+            buf[y][x + i] = (t[i] == ' ' ? bgCh : t[i])
+        }
+    }
+}
+
+vd render() {
+    out << "\033[H"
+    ⟳ (it y = 0; y < sH; y++) {
+        ⟳ (it x = 0; x < sW; x++) {
+            out << buf[y][x]
+        }
+        out << "\n"
+    }
+    out << std::flush
+}
+
+i_m {
+    out << "\033[2J" << std::flush
+
+    fl tm = 0.0f
+    bl iv = fs
+
+    v<Prt> dst
+    ⟳ (it i = 0; i < 20; i++) {
+        dst.pb(Prt{sc<fl>(ran() % sW), sc<fl>(ran() % sH), 0.0f, -sc<fl>((ran() % 10 + 5) / 10.0f), 0.0f, 0.0f, 1.0f})
+    }
+
+    v<Prt> sts
+    ⟳ (it i = 0; i < 20; i++) {
+        sts.pb(Prt{sc<fl>(ran() % sW), sc<fl>(ran() % sH), -sc<fl>((ran() % 6) + 3), 0.0f, 0.0f, 0.0f, 1.0f})
+    }
+
+    v<Prt> trl
+    v<Shd> shd
+
+    v<Ptl> ptl
+    ⟳ (it i = 0; i < 15; i++) {
+        ptl.pb(Ptl{sc<fl>(ran() % sW), sc<fl>(ran() % sH - sH), sc<fl>((ran() % 10 + 5) / 10.0f), sc<fl>(ran() % 360), sc<fl>((ran() % 20 + 10) / 10.0f), 2.0f})
+    }
+
+    bl sI = fs
+    fl d = 0.066f
+
+    ⟲ (tr) {
+        tm += d
+
+        ? (tm > 15.0f) {
+            tm = 0.0f
+            iv = fs
+            sI = fs
+            shd.clear()
+        }
+
+        ? (tm < 2.0f) {
+            bgCh = ' '
+            cls()
+            ⟳ (auto& d_ : dst) {
+                d_.y += d_.vy
+                ? (d_.y < 0) {
+                    d_.y = sH - 1
+                    d_.x = ran() % sW
+                }
+                buf[sc<it>(d_.y)][sc<it>(d_.x)] = '.'
+            }
+            fl alpha = sin((tm / 2.0f) * 3.14159f)
+            ? (alpha > 0.3f) {
+                text("BAD APPLE!!", sW / 2 - 6, sH / 2 - 1, '#')
+                text("Cmp++ ASCII Engine", sW / 2 - 9, sH / 2 + 1, '=')
+            }
+            text("Nagareteku toki no naka de demo", sW / 2 - 15, sH - 3, '-')
+
+        } | ? (tm >= 2.0f && tm < 5.0f) {
+            bgCh = '#'
+            cls()
+            
+            fl t = tm - 2.0f
+            fl aY = -5.0f
+            fl aX = sW / 2
+            fl rot = t * 4.0f
+            
+            ? (t < 1.5f) {
+                aY = -5.0f + (t / 1.5f) * (sH / 2 + 5.0f)
+            } | {
+                aY = sH / 2
+                fl bT = t - 1.5f
+                aY += sin(bT * 15.0f) * 4.0f * exp(-bT * 3.0f)
+            }
+
+            fl aS = 6.0f
+
+            circ(aX + cos(rot) * -1.0f, aY + sin(rot) * -1.0f, aS, ' ')
+            circ(aX - 2.0f + cos(rot + 1.0f) * 1.0f, aY - 1.0f + sin(rot + 1.0f) * 1.0f, aS * 0.9f, ' ')
+            circ(aX + 2.0f - cos(rot + 1.0f) * 1.0f, aY - 1.0f - sin(rot + 1.0f) * 1.0f, aS * 0.9f, ' ')
+
+            ⟳ (it i = 0; i < 4; i++) {
+                circ(aX + i, aY - aS - i * 0.5f, 1.2f, ' ')
+            }
+
+            ? (t >= 1.5f) {
+                fl sT = t - 1.5f
+                fl rd = sT * 50.0f
+                ? (rd < sW) {
+                    circ(sW / 2, aY, rd, ' ')
+                    circ(sW / 2, aY, rd - 2.0f, bgCh)
+                }
+            }
+
+            text("Nagareteku toki no naka de demo", sW / 2 - 15, sH - 3, ' ')
+
+        } | ? (tm >= 5.0f && tm < 8.0f) {
+            bgCh = ' '
+            cls()
+
+            fl rot = tm * 3.0f
+            fl yyX = 18.0f
+            fl yyY = 14.0f
+            fl yyR = 9.0f
+
+            circ(yyX, yyY, yyR, '=')
+            circ(yyX + cos(rot) * yyR / 2, yyY + sin(rot) * yyR / 2 * 0.7f, yyR / 2, '*')
+            circ(yyX + cos(rot + 3.14159f) * yyR / 2, yyY + sin(rot + 3.14159f) * yyR / 2 * 0.7f, yyR / 2, ' ')
+            circ(yyX + cos(rot) * yyR / 2, yyY + sin(rot) * yyR / 2 * 0.7f, 1.5f, ' ')
+            circ(yyX + cos(rot + 3.14159f) * yyR / 2, yyY + sin(rot + 3.14159f) * yyR / 2 * 0.7f, 1.5f, '*')
+
+            fl rX = 48.0f
+            fl rY = 15.0f
+            fl wv = sin(tm * 8.0f) * 1.5f
+
+            rect(rX - 8, rY - 4 + wv * 0.5f, 5, 3, '#')
+            rect(rX - 8, rY - 2 + wv * 0.3f, 3, 4, '#')
+
+            rect(rX - 6, rY - 1, 6, 8 + wv, '#')
+            tri(rX - 5, rY + 6 + wv, rX - 7, rY + 9 + wv, rX - 1, rY + 6 + wv, '#')
+
+            circ(rX - 2, rY - 1, 3.5f, '#')
+            tri(rX - 2, rY + 1, rX + 3, rY - 1, rX + 2, rY + 1, '#')
+
+            circ(rX + 2, rY + 3, 1.5f, '#')
+
+            text("Kedarusage hora guruguru mawatte", sW / 2 - 16, sH - 3, '=')
+
+        } | ? (tm >= 8.0f && tm < 11.0f) {
+            bgCh = ' '
+            cls()
+
+            ⟳ (auto& star : sts) {
+                star.x += star.vx
+                ? (star.x < 0) {
+                    star.x = sW - 1
+                    star.y = ran() % sH
+                }
+                buf[sc<it>(star.y)][sc<it>(star.x)] = '*'
+            }
+
+            fl mX = 35.0f
+            fl mY = 13.0f + sin(tm * 6.0f) * 2.0f
+
+            line(mX - 15, mY + 3, mX + 15, mY + 1, '=')
+            tri(mX - 12, mY + 3, mX - 18, mY + 5, mX - 17, mY + 2, '#')
+
+            tri(mX, mY - 4, mX - 4, mY - 1, mX + 4, mY - 1, '#')
+            rect(mX - 5, mY - 1, 10, 1, '#')
+
+            circ(mX, mY + 1, 2.5f, '#')
+            rect(mX - 3, mY + 1, 6, 4, '#')
+
+            tri(mX - 3, mY + 7, mX, mY + 3, mX + 3, mY + 7, '#')
+
+            text("Watashi no kokoro mo shinteyuku no ka na", sW / 2 - 19, sH - 3, '*')
+
+        } | ? (tm >= 11.0f && tm < 12.0f) {
+            iv = tr
+            bgCh = ' '
+            cls()
+
+            ? (!sI) {
+                sI = tr
+                shd.clear()
+                it cols = 4
+                it rows = 3
+                fl cW = sc<fl>(sW) / cols
+                fl cH = sc<fl>(sH) / rows
+                ⟳ (it r = 0; r < rows; r++) {
+                    ⟳ (it c = 0; c < cols; c++) {
+                        fl cx = c * cW + cW / 2.0f
+                        fl cy = r * cH + cH / 2.0f
+                        fl dx = cx - (sW / 2.0f)
+                        fl dy = cy - (sH / 2.0f)
+                        fl ds = sqrt(dx*dx + dy*dy)
+                        ? (ds == 0.0f) { ds = 1.0f; }
+                        fl fc = 10.0f + (ran() % 10)
+                        fl vx = (dx / ds) * fc
+                        fl vy = (dy / ds) * fc - 5.0f
+
+                        shd.pb(Shd{cx, cy, vx, vy, sc<fl>(ran() % 360), sc<fl>((ran() % 6 - 3)), cW * 0.6f})
+                    }
+                }
+            }
+
+            ⟳ (auto& s : shd) {
+                s.vy += 15.0f * d
+                s.x += s.vx * d
+                s.y += s.vy * d
+                s.angle += s.rotSpeed * d * 10.0f
+
+                fl a = s.angle * (3.14159f / 180.0f)
+                fl a1 = a
+                fl a2 = a + 2.09439f
+                fl a3 = a + 4.18879f
+
+                fl x1 = s.x + cos(a1) * s.size
+                fl y1 = s.y + sin(a1) * s.size * 0.7f
+                fl x2 = s.x + cos(a2) * s.size
+                fl y2 = s.y + sin(a2) * s.size * 0.7f
+                fl x3 = s.x + cos(a3) * s.size
+                fl y3 = s.y + sin(a3) * s.size * 0.7f
+
+                tri(x1, y1, x2, y2, x3, y3, '%')
+            }
+
+            text("Futei na koto mo shitteyuku no ka na", sW / 2 - 17, sH - 3, '%')
+
+        } | {
+            bgCh = ' '
+            cls()
+
+            ⟳ (auto& p : ptl) {
+                p.y += p.speed
+                p.x += sin(tm * p.waveSpeed) * 0.6f
+                p.angle += p.speed * 2.0f
+                ? (p.y > sH - 1) {
+                    p.y = 0
+                    p.x = ran() % sW
+                }
+                buf[sc<it>(p.y)][sc<it>(p.x)] = 'o'
+            }
+
+            line(0, 0, 15, 6, '#')
+            line(15, 6, 25, 9, '#')
+            line(15, 6, 20, 12, '#')
+
+            circ(15, 6, 2.0f, 'o')
+            circ(25, 9, 2.5f, 'o')
+            circ(20, 12, 2.2f, 'o')
+
+            fl fO = 1.0f
+            ? (tm > 14.0f) {
+                fO = 1.0f - (tm - 14.0f)
+            }
+
+            ? (fO > 0.2f) {
+                text("BAD APPLE!!", sW / 2 - 6, sH / 2 - 2, '#')
+                text("Cmp++ Pure ASCII Demo", sW / 2 - 11, sH / 2, '=')
+                text("Thank you for watching!", sW / 2 - 11, sH / 2 + 2, '*')
+            }
+
+            text("Tada yudane teku dake no sono koto", sW / 2 - 16, sH - 3, 'o')
+        }
+
+        rect(0, sH - 4, sW, 1, '=')
+        text("BAD APPLE!! - Cmp++ Pure ASCII Demo", 3, 1, '#')
+
+        render()
+        std::this_thread::sleep_for(std::chrono::milliseconds(66))
+    }
+
+    → 0
+}
