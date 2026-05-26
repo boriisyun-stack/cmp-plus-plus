@@ -62,15 +62,7 @@ A classic Snake game written entirely in Cmp++ using Raylib.
   node cmppp.js snake.cmp -run
   ```
 
-### 2. Bad Apple Procedural Visualizer (`badapple.cmp`)
-A smooth 60 FPS silhouette animation visualizer showing Touhou's iconic *Bad Apple!!* sequences.
-- Features: Black-and-white vector animations, apple dropping, spinning yin-yang sector, Reimu head panning, Marisa broom flight with star fields, screen shattering transitions, and synchronized lyrics text.
-- Execute:
-  ```bash
-  node cmppp.js badapple.cmp -run
-  ```
-
-### 3. Bad Apple Pure ASCII Console Visualizer (`badapple_ascii.cmp`)
+### 2. Bad Apple Pure ASCII Console Visualizer (`badapple_ascii.cmp`)
 A dependency-free terminal ASCII rendering of the Bad Apple visualization.
 - Features: Custom character-graphics buffer engine, retro console aesthetics, falling apples, spinning Yin-Yang, Reimu/Marisa character-art silhouette animations, glass shattering effects, and terminal-printed lyrics.
 - Execute:
