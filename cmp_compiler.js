@@ -178,6 +178,14 @@ const CmpCompiler = {
         .replace(/\bunique_ptr\s*</g, "up<")
         .replace(/\bstring\b/g, "str")
         .replace(/\bfloat\b/g, "fl")
+        .replace(/\bbool\b/g, "bl")
+        .replace(/\btrue\b/g, "tr")
+        .replace(/\bfalse\b/g, "fs")
+        .replace(/\bint\b/g, "it")
+        .replace(/\bvoid\b/g, "vd")
+        .replace(/\bdouble\b/g, "db")
+        .replace(/\bchar\b/g, "ch")
+        .replace(/\bstruct\b/g, "st")
         // Constants
         .replace(/\bnullptr\b/g, "Ø")
         // Functions
@@ -236,7 +244,7 @@ const CmpCompiler = {
       let trimmed = line.trim();
       let indent = line.match(/^\s*/)[0];
       
-      if (trimmed.startsWith("struct ")) {
+      if (trimmed.startsWith("struct ") || trimmed.startsWith("st ")) {
         inStruct = true;
         structBraceCount = 0;
       }
@@ -330,6 +338,14 @@ const CmpCompiler = {
         .replace(/\bsp\s*<\s*([^>]+)\s*>/g, "std::shared_ptr<$1>")
         .replace(/\bup\s*<\s*([^>]+)\s*>/g, "std::unique_ptr<$1>")
         .replace(/\bfl\b/g, "float")
+        .replace(/\bbl\b/g, "bool")
+        .replace(/\btr\b/g, "true")
+        .replace(/\bfs\b/g, "false")
+        .replace(/\bit\b/g, "int")
+        .replace(/\bvd\b/g, "void")
+        .replace(/\bdb\b/g, "double")
+        .replace(/\bch\b/g, "char")
+        .replace(/\bst\b/g, "struct")
         // Functions
         .replace(/\bran\s*\(/g, "rand(")
         .replace(/\bto_str\s*\(/g, "std::to_string(")
@@ -417,14 +433,14 @@ const CmpCompiler = {
     
     // Parse struct definitions first to map object constructs
     let structFields = {};
-    let structRegex = /struct\s+(\w+)\s*\{([^}]+)\}/g;
+    let structRegex = /\b(st|struct)\s+(\w+)\s*\{([^}]+)\}/g;
     let match;
     let cleanCode = cmpCode;
     while ((match = structRegex.exec(cmpCode)) !== null) {
-      let name = match[1];
-      let body = match[2];
+      let name = match[2];
+      let body = match[3];
       let fields = [];
-      let fieldRegex = /\b\w+\s+(\w+);/g;
+      let fieldRegex = /\b\w+\s+(\w+)\b/g;
       let fMatch;
       while ((fMatch = fieldRegex.exec(body)) !== null) {
         fields.push(fMatch[1]);
@@ -433,7 +449,7 @@ const CmpCompiler = {
     }
     
     // Clean struct declarations from execution lines
-    cleanCode = cleanCode.replace(/struct\s+\w+\s*\{[^}]+\};?/g, '');
+    cleanCode = cleanCode.replace(/\b(st|struct)\s+\w+\s*\{[^}]+\};?/g, '');
     
     lines = cleanCode.split('\n');
     for (let line of lines) {
@@ -471,6 +487,14 @@ const CmpCompiler = {
     
     let transpileLine = (line) => {
       let js = line
+        .replace(/\bit\s+/g, 'let ')
+        .replace(/\bbl\s+/g, 'let ')
+        .replace(/\bvd\s+/g, 'let ')
+        .replace(/\bdb\s+/g, 'let ')
+        .replace(/\bch\s+/g, 'let ')
+        .replace(/\bst\s+/g, 'let ')
+        .replace(/\btr\b/g, 'true')
+        .replace(/\bfs\b/g, 'false')
         .replace(/\bint\s+/g, 'let ')
         .replace(/\bfloat\s+/g, 'let ')
         .replace(/\bfl\s+/g, 'let ')

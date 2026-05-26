@@ -4,7 +4,7 @@
 #i str
 
 #Struct for particles in scene
-struct Particle {
+st Particle {
     fl x
     fl y
     fl speed
@@ -12,8 +12,8 @@ struct Particle {
 }
 
 i_m {
-    int screenW = 600
-    int screenH = 450
+    it screenW = 600
+    it screenH = 450
 
     init_w(screenW, screenH, "Cmp++ Bad Apple Procedural Visualizer")
     set_fps(60)
@@ -21,11 +21,11 @@ i_m {
     #Variables for state
     fl time = 0.0f
     #inverted determines background colors: White vs Black
-    bool inverted = false
+    bl inverted = fs
 
     #Initialize star particles for scene 3
     v<Particle> stars
-    ⟳ (int idx = 0; idx < 30; idx++) {
+    ⟳ (it idx = 0; idx < 30; idx++) {
         stars.pb(Particle{
             sc<fl>(ran() % screenW),
             sc<fl>(ran() % screenH),
@@ -41,7 +41,7 @@ i_m {
         #Loop time at 12.0 seconds to restart the song cycle
         ? (time > 12.0f) {
             time = 0.0f
-            inverted = false
+            inverted = fs
         }
 
         #Drawing block
@@ -62,7 +62,7 @@ i_m {
             circ(screenW / 2 + 12, appleY - 8, appleSize * 0.9f, BLACK)
 
             #Stem (represented as a curve of tiny circles)
-            ⟳ (int i = 0; i < 8; i++) {
+            ⟳ (it i = 0; i < 8; i++) {
                 circ(screenW / 2 + i * 2, appleY - appleSize - i * 1.5f, 4.0f, BLACK)
             }
 
@@ -74,14 +74,14 @@ i_m {
 
         } | ? (time >= 2.5f && time < 3.0f) {
             #Screen shattering transition
-            inverted = true
+            inverted = tr
             bg_cls(BLACK)
 
             #Shatter lines (expanding)
             fl t = (time - 2.5f) * 2.0f
             circ(screenW / 2, screenH / 2, t * 400.0f, WHITE)
 
-            ⟳ (int i = 0; i < 8; i++) {
+            ⟳ (it i = 0; i < 8; i++) {
                 fl angle = i * 45.0f * (3.14159f / 180.0f)
                 fl endX = screenW / 2 + cos(angle) * (t * 500.0f)
                 fl endY = screenH / 2 + sin(angle) * (t * 500.0f)
