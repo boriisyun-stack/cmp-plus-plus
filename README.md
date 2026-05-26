@@ -24,12 +24,12 @@ Cmp++ is a **unified compiled language**. It compiles directly to native binarie
 
 ### Prerequisites
 - **Node.js** (v14 or higher)
-- **C++ Compiler** (`g++` or `clang++` with C++17 support)
-- **Raylib** (optional, required to run the game demos)
+- **C++ Compiler** (`g++` or `clang++` - optional for Web Sandbox, required for native compilations)
+- **Raylib** (optional, required to run the game natively)
   - macOS: `brew install raylib`
 
-### Compiling and Running
-To compile a Cmp++ source file (`.cmp`), run the unified compiler script:
+### Compiling and Running (With g++)
+To compile a Cmp++ source file (`.cmp`) to a native binary:
 
 ```bash
 # Transpiles, compiles, and immediately executes the binary
@@ -38,6 +38,15 @@ node cmppp.js main.cmp -run
 # Compile only to a custom binary output
 node cmppp.js main.cmp -o my_app
 ```
+
+### Running Without g++ (Web Sandbox Mode)
+If `g++` is not installed on your system, or if you explicitly request it using the `-web` flag, Cmp++ automatically transpiles the Cmp++ code to JavaScript and runs it inside a high-fidelity browser-based emulator (HTML5 Canvas):
+
+```bash
+# Runs the game in your default web browser (no compiler needed)
+node cmppp.js snake.cmp -web
+```
+Alternatively, you can open `index.html` directly in any browser and use the sandbox editor to write, transpile, and execute Cmp++ code in real-time.
 
 ---
 

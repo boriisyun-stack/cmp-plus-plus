@@ -80,12 +80,13 @@ This dictionary lists all native shorthand codes, symbols, keywords, standard li
 | `mv(x)` | `std::move(x)` | Transfer resource ownership |
 | `sc<T>(x)` | `static_cast<T>(x)` | Compile-time type cast |
 | `dc<T>(x)` | `dynamic_cast<T>(x)` | Run-time type cast |
+| `to_str(x)` | `std::to_string(x)` | Convert numeric values to string |
 
 ---
 
 ## 5. Raylib GUI Shorthands
 
-These shorthands map directly to Raylib's window, input, shapes, text, and timing functions:
+These shorthands map directly to Raylib's window, input, shapes, text, timing, and color functions:
 
 | Cmp++ Shorthand | Raylib API | Description |
 | :--- | :--- | :--- |
@@ -94,9 +95,14 @@ These shorthands map directly to Raylib's window, input, shapes, text, and timin
 | `draw_b()` | `BeginDrawing()` | Starts rendering frame cycle bounds |
 | `draw_e()` | `EndDrawing()` | Ends rendering frame cycle, swapping buffers |
 | `bg_cls(c)` | `ClearBackground(c)` | Clears the window screen to the selected color `c` |
-| `draw_rect(x, y, w, h, c)`| `DrawRectangle(x, y, w, h, c)`| Renders a solid rectangle at `x`, `y` with dimensions `w` $\times$ `h` |
-| `draw_circ(x, y, r, c)` | `DrawCircle(x, y, r, c)` | Renders a solid circle at center `x`, `y` with radius `r` |
-| `draw_txt(t, x, y, s, c)` | `DrawText(t, x, y, s, c)` | Renders string `t` at coordinate `x`, `y` with size `s` in color `c` |
+| `rect(x,y,w,h,c)` | `DrawRectangle(x, y, w, h, c)`| Renders a solid rectangle at `x`, `y` with dimensions `w` $\times$ `h` |
+| `circ(x, y, r, c)` | `DrawCircle(x, y, r, c)` | Renders a solid circle at center `x`, `y` with radius `r` |
+| `text(t, x, y, s, c)`| `DrawText(t, x, y, s, c)` | Renders string `t` at coordinate `x`, `y` with size `s` in color `c` |
+| `line(v1,v2,th,c)` | `DrawLineEx(v1, v2, th, c)` | Renders a line between `v1` and `v2` with thickness `th` in color `c` |
+| `tri(v1, v2, v3, c)`| `DrawTriangle(v1, v2, v3, c)`| Renders a filled triangle defined by `v1`, `v2`, and `v3` in color `c` |
+| `sect(ctr,r,s,e,sg,c)`|`DrawCircleSector(ctr, r, s, e, sg, c)`| Renders a circle sector at `ctr` with radius `r`, from start `s` to end `e` |
 | `key_p(k)` | `IsKeyPressed(k)` | Evaluates to true if key `k` was pressed in this frame |
 | `key_d(k)` | `IsKeyDown(k)` | Evaluates to true if key `k` is currently held down |
 | `set_fps(f)` | `SetTargetFPS(f)` | Sets target rendering framerate to `f` frames per second |
+| `dt()` | `GetFrameTime()` | Returns the duration of the last rendered frame in seconds (delta time) |
+| `fade(c, a)` | `Fade(c, a)` | Adjusts color `c` transparency by alpha fraction `a` (0.0 to 1.0) |
