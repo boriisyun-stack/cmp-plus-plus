@@ -231,11 +231,27 @@ document.addEventListener("DOMContentLoaded", () => {
   window.LIGHTGRAY = 'lightgray';
   window.GRAY = 'gray';
 
+  // Contracted colors
+  window.BLK = 'black';
+  window.WHT = 'white';
+  window.GRN = 'green';
+  window.LIM = 'lime';
+  window.DKGY = 'darkgray';
+  window.LTGY = 'lightgray';
+  window.BLU = 'blue';
+
   window.KEY_RIGHT = 'ArrowRight';
   window.KEY_LEFT = 'ArrowLeft';
   window.KEY_UP = 'ArrowUp';
   window.KEY_DOWN = 'ArrowDown';
   window.KEY_SPACE = ' ';
+
+  // Contracted keys
+  window.K_R = 'ArrowRight';
+  window.K_L = 'ArrowLeft';
+  window.K_U = 'ArrowUp';
+  window.K_D = 'ArrowDown';
+  window.K_S = ' ';
 
   // Raylib emulator functions
   window.init_w = function(w, h, title) {

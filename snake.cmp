@@ -3,129 +3,111 @@
 #i cstd
 #i chr
 
-st Segment {
+st Seg {
     it x
     it y
 }
 
 i_m {
-    it screenW = 800
-    it screenH = 600
-    it grid = 20
+    it sW = 800
+    it sH = 600
+    it gd = 20
 
-    init_w(screenW, screenH, "Cmp++ Snake Game")
+    init_w(sW, sH, "Cmp++ Snake Game")
     set_fps(60)
 
-    #Game variables
-    v<Segment> snake
-    snake.pb(Segment{20, 15})
-    snake.pb(Segment{19, 15})
-    snake.pb(Segment{18, 15})
+    v<Seg> snk
+    snk.pb(Seg{20, 15})
+    snk.pb(Seg{19, 15})
+    snk.pb(Seg{18, 15})
 
-    it dirX = 1
-    it dirY = 0
+    it dX = 1
+    it dY = 0
 
-    #Spawn food
-    it foodX = 5
-    it foodY = 5
+    it fX = 5
+    it fY = 5
 
-    it score = 0
-    bl gameOver = fs
-    it frames = 0
+    it scr = 0
+    bl gO = fs
+    it fr = 0
 
     ⟲ (!w_close()) {
-        ? (!gameOver) {
-            frames++
+        ? (!gO) {
+            fr++
 
-            #Handle inputs
-            ? (key_p(KEY_RIGHT) && dirX != -1) { dirX = 1; dirY = 0; }
-            ? (key_p(KEY_LEFT) && dirX != 1) { dirX = -1; dirY = 0; }
-            ? (key_p(KEY_UP) && dirY != 1) { dirX = 0; dirY = -1; }
-            ? (key_p(KEY_DOWN) && dirY != -1) { dirX = 0; dirY = 1; }
+            ? (key_p(K_R) && dX != -1) { dX = 1; dY = 0; }
+            ? (key_p(K_L) && dX != 1) { dX = -1; dY = 0; }
+            ? (key_p(K_U) && dY != 1) { dX = 0; dY = -1; }
+            ? (key_p(K_D) && dY != -1) { dX = 0; dY = 1; }
 
-            #Update position every 6 frames (speed control)
-            ? (frames >= 6) {
-                frames = 0
+            ? (fr >= 6) {
+                fr = 0
 
-                #Move body
-                ⟳ (it idx = snake.size() - 1; idx > 0; idx--) {
-                    snake[idx] = snake[idx - 1]
+                ⟳ (it idx = snk.size() - 1; idx > 0; idx--) {
+                    snk[idx] = snk[idx - 1]
                 }
 
-                #Move head
-                snake[0].x += dirX
-                snake[0].y += dirY
+                snk[0].x += dX
+                snk[0].y += dY
 
-                #Wall collision
-                ? (snake[0].x < 0 || snake[0].x >= screenW / grid || snake[0].y < 0 || snake[0].y >= screenH / grid) {
-                    gameOver = tr
+                ? (snk[0].x < 0 || snk[0].x >= sW / gd || snk[0].y < 0 || snk[0].y >= sH / gd) {
+                    gO = tr
                 }
 
-                #Self collision
-                ⟳ (it idx = 1; idx < snake.size(); idx++) {
-                    ? (snake[0].x == snake[idx].x && snake[0].y == snake[idx].y) {
-                        gameOver = tr
+                ⟳ (it idx = 1; idx < snk.size(); idx++) {
+                    ? (snk[0].x == snk[idx].x && snk[0].y == snk[idx].y) {
+                        gO = tr
                     }
                 }
 
-                #Food collision
-                ? (snake[0].x == foodX && snake[0].y == foodY) {
-                    score += 10
+                ? (snk[0].x == fX && snk[0].y == fY) {
+                    scr += 10
 
-                    #Grow snake
-                    snake.pb(Segment{snake.back().x, snake.back().y})
+                    snk.pb(Seg{snk.back().x, snk.back().y})
 
-                    #Randomize food position
-                    foodX = ran() % (screenW / grid)
-                    foodY = ran() % (screenH / grid)
+                    fX = ran() % (sW / gd)
+                    fY = ran() % (sH / gd)
                 }
             }
         } | {
-            #Restart game on space press
-            ? (key_p(KEY_SPACE)) {
-                snake.clear()
-                snake.pb(Segment{20, 15})
-                snake.pb(Segment{19, 15})
-                snake.pb(Segment{18, 15})
-                dirX = 1
-                dirY = 0
-                score = 0
-                gameOver = fs
-                frames = 0
-                foodX = ran() % (screenW / grid)
-                foodY = ran() % (screenH / grid)
+            ? (key_p(K_S)) {
+                snk.clear()
+                snk.pb(Seg{20, 15})
+                snk.pb(Seg{19, 15})
+                snk.pb(Seg{18, 15})
+                dX = 1
+                dY = 0
+                scr = 0
+                gO = fs
+                fr = 0
+                fX = ran() % (sW / gd)
+                fY = ran() % (sH / gd)
             }
         }
 
-        #Drawing
         draw_b()
-        bg_cls(BLACK)
+        bg_cls(BLK)
 
-        #Draw grid board borders
-        rect(0, 0, screenW, 5, DARKGRAY)
-        rect(0, 0, 5, screenH, DARKGRAY)
-        rect(0, screenH - 5, screenW, 5, DARKGRAY)
-        rect(screenW - 5, 0, 5, screenH, DARKGRAY)
+        rect(0, 0, sW, 5, DKGY)
+        rect(0, 0, 5, sH, DKGY)
+        rect(0, sH - 5, sW, 5, DKGY)
+        rect(sW - 5, 0, 5, sH, DKGY)
 
-        #Draw Snake
-        ⟳ (const auto& seg : snake) {
-            rect(seg.x * grid, seg.y * grid, grid - 1, grid - 1, GREEN)
+        ⟳ (const auto& seg : snk) {
+            rect(seg.x * gd, seg.y * gd, gd - 1, gd - 1, GRN)
         }
 
-        #Draw head distinctly
-        rect(snake[0].x * grid, snake[0].y * grid, grid - 1, grid - 1, LIME)
+        rect(snk[0].x * gd, snk[0].y * gd, gd - 1, gd - 1, LIM)
 
-        #Draw Food
-        rect(foodX * grid, foodY * grid, grid - 1, grid - 1, RED)
+        rect(fX * gd, fY * gd, gd - 1, gd - 1, RED)
 
-        #Draw HUD info
-        str scoreText = "Score: " + to_str(score)
-        text(scoreText.c_str(), 15, 15, 20, WHITE)
+        str sT = "Score: " + to_str(scr)
+        text(sT.c_str(), 15, 15, 20, WHT)
 
-        ? (gameOver) {
-            rect(screenW / 2 - 200, screenH / 2 - 80, 400, 160, fade(BLACK, 0.8f))
-            text("GAME OVER", screenW / 2 - 100, screenH / 2 - 50, 40, RED)
-            text("Press SPACE to Restart", screenW / 2 - 150, screenH / 2 + 10, 20, WHITE)
+        ? (gO) {
+            rect(sW / 2 - 200, sH / 2 - 80, 400, 160, fade(BLK, 0.8f))
+            text("GAME OVER", sW / 2 - 100, sH / 2 - 50, 40, RED)
+            text("Press SPACE to Restart", sW / 2 - 150, sH / 2 + 10, 20, WHT)
         }
 
         draw_e()

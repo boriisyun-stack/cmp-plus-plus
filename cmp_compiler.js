@@ -101,6 +101,97 @@ const CmpCompiler = {
     "pr": "print"
   },
 
+  // Contraction mappings for variable names and constants to maximize LLM token savings
+  contractionMap: {
+    "screenW": "sW",
+    "screenH": "sH",
+    "gameOver": "gO",
+    "grid": "gd",
+    "frames": "fr",
+    "score": "scr",
+    "foodX": "fX",
+    "foodY": "fY",
+    "dirX": "dX",
+    "dirY": "dY",
+    "snake": "snk",
+    "stars": "sts",
+    "time": "tm",
+    "inverted": "iv",
+    "Particle": "Prt",
+    "Segment": "Seg",
+    "width": "w",
+    "height": "h",
+    "index": "idx",
+    "result": "res",
+    "error": "err",
+    "buffer": "buf",
+    "counter": "cnt",
+    "pointer": "ptr",
+    "object": "obj",
+    "value": "val",
+    "number": "num",
+    "scoreText": "sT",
+    "appleY": "aY",
+    "appleSize": "aS",
+    "DARKGRAY": "DKGY",
+    "LIGHTGRAY": "LTGY",
+    "GREEN": "GRN",
+    "BLUE": "BLU",
+    "WHITE": "WHT",
+    "BLACK": "BLK",
+    "LIME": "LIM",
+    "KEY_RIGHT": "K_R",
+    "KEY_LEFT": "K_L",
+    "KEY_UP": "K_U",
+    "KEY_DOWN": "K_D",
+    "KEY_SPACE": "K_S"
+  },
+
+  reverseContractionMap: {
+    "sW": "screenW",
+    "sH": "screenH",
+    "gO": "gameOver",
+    "gd": "grid",
+    "fr": "frames",
+    "scr": "score",
+    "fX": "foodX",
+    "fY": "foodY",
+    "dX": "dirX",
+    "dY": "dirY",
+    "snk": "snake",
+    "sts": "stars",
+    "tm": "time",
+    "iv": "inverted",
+    "Prt": "Particle",
+    "Seg": "Segment",
+    "w": "width",
+    "h": "height",
+    "idx": "index",
+    "res": "result",
+    "err": "error",
+    "buf": "buffer",
+    "cnt": "counter",
+    "ptr": "pointer",
+    "obj": "object",
+    "val": "value",
+    "num": "number",
+    "sT": "scoreText",
+    "aY": "appleY",
+    "aS": "appleSize",
+    "DKGY": "DARKGRAY",
+    "LTGY": "LIGHTGRAY",
+    "GRN": "GREEN",
+    "BLU": "BLUE",
+    "WHT": "WHITE",
+    "BLK": "BLACK",
+    "LIM": "LIME",
+    "K_R": "KEY_RIGHT",
+    "K_L": "KEY_LEFT",
+    "K_U": "KEY_UP",
+    "K_D": "KEY_DOWN",
+    "K_S": "KEY_SPACE"
+  },
+
   // 1. C++ TO CMP++ COMPILER
   compileCode: function(cppCode) {
     if (!cppCode) return "";
@@ -116,9 +207,8 @@ const CmpCompiler = {
         continue;
       }
 
-      // Single line comments
+      // Single line comments (stripped to maximize token savings)
       if (trimmed.startsWith("//")) {
-        cmpLines.push(indent + "#" + trimmed.substring(2).trim());
         continue;
       }
 
@@ -223,6 +313,11 @@ const CmpCompiler = {
         .trim();
 
       if (compiled) {
+        // Apply contractions to variables and constants
+        for (let key in this.contractionMap) {
+          let regex = new RegExp(`\\b${key}\\b`, 'g');
+          compiled = compiled.replace(regex, this.contractionMap[key]);
+        }
         cmpLines.push(indent + compiled);
       }
     }
@@ -377,6 +472,12 @@ const CmpCompiler = {
         // Restore common math operators
         .replace(/≤/g, "<=")
         .replace(/≥/g, ">=");
+
+      // Restore contractions to variables and constants
+      for (let key in this.reverseContractionMap) {
+        let regex = new RegExp(`\\b${key}\\b`, 'g');
+        decompiled = decompiled.replace(regex, this.reverseContractionMap[key]);
+      }
 
       // Safety trim before semicolon insertion
       decompiled = decompiled.trim();
