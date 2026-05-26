@@ -16,6 +16,8 @@ This dictionary lists all native shorthand codes, symbols, keywords, standard li
 | `⟲` | `while` | Condition/While loop block |
 | `→` or `rt` | `return` | Function return operator |
 | `Ø` | `nullptr` | Null pointer constant |
+| `tr` | `true` | Boolean true literal |
+| `fs` | `false` | Boolean false literal |
 | `c&` | `const auto&` | Constant automatic reference type |
 | `out << x` | `std::cout << x;` | Standard output stream insertion |
 | `in >> x` | `std::cin >> x;` | Standard input stream extraction |
@@ -70,6 +72,12 @@ This dictionary lists all native shorthand codes, symbols, keywords, standard li
 | Cmp++ Shorthand | C++ Type / Function | Description |
 | :--- | :--- | :--- |
 | `fl` | `float` | 32-bit single-precision floating point type |
+| `bl` | `bool` | Boolean data type |
+| `it` | `int` | Integer data type |
+| `vd` | `void` | Empty/void data type |
+| `db` | `double` | Double precision floating point type |
+| `ch` | `char` | Single character data type |
+| `st` | `struct` | Struct compound type declaration |
 | `str` | `std::string` | String type |
 | `v<T>` | `std::vector<T>` | Dynamic array container type |
 | `sp<T>` | `std::shared_ptr<T>` | Shared ownership smart pointer type |
