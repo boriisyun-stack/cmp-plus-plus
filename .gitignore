@@ -1,0 +1,17 @@
+# Binaries
+main
+snake
+badapple
+a.out
+*.exe
+*.o
+*.obj
+*.out
+
+# Intermediate generated C++ files
+main.cpp
+snake.cpp
+badapple.cpp
+
+# OS files
+.DS_Store

@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+/* Color Variables */
+:root {
+  --bg-darker: #05060b;
+  --bg-dark: #0a0c16;
+  --bg-card: rgba(16, 20, 38, 0.6);
+  --border-color: rgba(99, 102, 241, 0.15);
+  --border-hover: rgba(99, 102, 241, 0.4);
+  
+  --color-primary: #6366f1; /* Indigo */
+  --color-secondary: #06b6d4; /* Cyan */
+  --color-accent: #a855f7; /* Purple */
+  --color-success: #10b981; /* Emerald */
+  --color-text-main: #f3f4f6;
+  --color-text-muted: #9ca3af;
+  
+  --glow-primary: 0 0 20px rgba(99, 102, 241, 0.3);
+  --glow-secondary: 0 0 20px rgba(6, 118, 212, 0.3);
+  --glow-accent: 0 0 25px rgba(168, 85, 247, 0.35);
+}
+
+/* Base Styles */
+body {
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-darker);
+  color: var(--color-text-main);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Custom background mesh */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Glassmorphism Panel */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(10, 12, 22, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.5);
+}
+
+/* Font styles */
+.font-mono-code {
+  font-family: 'Fira Code', 'Courier New', Courier, monospace;
+}
+
+/* Glowing text */
+.glow-text-purple {
+  text-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+}
+
+.glow-text-cyan {
+  text-shadow: 0 0 15px rgba(6, 182, 212, 0.6);
+}
+
+.glow-text-indigo {
+  text-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+}
+
+/* Neon buttons */
+.btn-neon-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-neon-primary:hover {
+  box-shadow: var(--glow-accent);
+  transform: translateY(-1px);
+}
+
+.btn-neon-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  transition: 0.75s;
+  opacity: 0;
+}
+
+.btn-neon-primary:hover::after {
+  opacity: 1;
+  left: 125%;
+}
+
+.btn-neon-secondary {
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.btn-neon-secondary:hover {
+  background: rgba(6, 182, 212, 0.1);
+  box-shadow: var(--glow-secondary);
+  transform: translateY(-1px);
+}
+
+/* Segmented Control / Tabs */
+.segment-tab {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.segment-tab.active {
+  color: #fff;
+}
+
+.segment-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-secondary), var(--color-primary));
+  box-shadow: 0 0 8px var(--color-secondary);
+}
+
+/* Custom Switch Toggle */
+.toggle-switch-checkbox:checked + .toggle-switch-label {
+  background-color: var(--color-primary);
+}
+
+.toggle-switch-checkbox:checked + .toggle-switch-label .toggle-switch-inner {
+  transform: translateX(24px);
+}
+
+/* Token Savings Circle Gauge */
+.progress-ring__circle {
+  transition: stroke-dashoffset 0.35s;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+/* Code area formatting */
+textarea {
+  resize: none;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+}
+
+/* Table styles inside documentation */
+.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.doc-table th, .doc-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.doc-table th {
+  text-align: left;
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+/* Keyframe animations */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.5);
+  }
+}
+
+.pulse-glow {
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.float-animation {
+  animation: float 4s infinite ease-in-out;
+}
+
+/* Code highlighting styles */
+.keyword-λ { color: var(--color-accent); font-weight: bold; }
+.keyword-rt { color: #f43f5e; }
+.keyword-cond { color: #f59e0b; }
+.keyword-log { color: var(--color-secondary); }
+.comment-line { color: var(--color-text-muted); font-style: italic; }

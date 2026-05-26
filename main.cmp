@@ -1,0 +1,15 @@
+#i io vec alg
+i_m {
+    # Initialize vector with unsorted integers
+    v<int> nums = {9, 2, 7, 4, 5, 1, 8, 3, 6}
+    
+    # Sort the vector using compact sort
+    srt(nums)
+    
+    out << "Sorted Cmp++ Output: "
+    ⟳ (c& x : nums) {
+        out << x << " "
+    }
+    out << el
+    → 0
+}

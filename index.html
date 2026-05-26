@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cmp++ | C++ Dialect Token-Optimized AI Language</title>
+  <!-- SEO Tags -->
+  <meta name="description" content="Cmp++: A C++ dialect representation optimized for AI token density. Save up to 70% on token counts, decrease latency, and lower API costs.">
+  <meta name="keywords" content="Cmp++, Token Optimization, C++, Compiler, Transpiler, AI Programming Language, LLM Tokenizer">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cyberDark: '#05060b',
+            cyberCard: 'rgba(16, 20, 38, 0.6)',
+            cyberIndigo: '#6366f1',
+            cyberCyan: '#06b6d4',
+            cyberPurple: '#a855f7',
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-screen text-gray-100 flex flex-col">
+
+  <!-- Header -->
+  <header class="border-b border-indigo-950/40 backdrop-blur-md sticky top-0 z-50 py-4 px-6 md:px-12 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyberIndigo to-cyberCyan flex items-center justify-center shadow-lg shadow-indigo-500/20 font-bold text-xl tracking-tighter">C+</div>
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-cyberCyan">Cmp<span class="text-cyberCyan font-extrabold">++</span></h1>
+        <p class="text-xs text-gray-400">Token-Compressed Dialect of C++</p>
+      </div>
+    </div>
+    
+    <nav class="hidden md:flex gap-6 text-sm font-medium">
+      <a href="#playground" class="text-gray-300 hover:text-white transition">Playground</a>
+      <a href="#analytics" class="text-gray-300 hover:text-white transition">Analytics</a>
+      <a href="#documentation" class="text-gray-300 hover:text-white transition">Specification</a>
+    </nav>
+
+    <div>
+      <a href="#playground" class="btn-neon-primary px-4 py-2 rounded-lg text-sm font-semibold inline-block">Try Sandbox</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="px-6 md:px-12 py-16 text-center max-w-4xl mx-auto flex-shrink-0">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyberIndigo/30 bg-cyberIndigo/5 text-xs text-indigo-300 mb-6 pulse-glow">
+      <span class="w-2 h-2 rounded-full bg-cyberCyan animate-pulse"></span>
+      Cmp++ Dialect: The Language of Token Efficiency
+    </div>
+    <h2 class="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+      Write C++ With <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyberCyan via-cyberIndigo to-cyberPurple">Fewer Tokens</span>.
+    </h2>
+    <p class="text-lg text-gray-400 mb-8 max-w-2xl mx-auto">
+      Cmp++ is a compressed programming syntax designed for AI-to-AI and AI-to-Compiler communications. It maps directly to standard C++, compiling to native binaries using the system's `g++` toolchain while reducing token footprint by <span class="text-cyberCyan font-bold">up to 70%</span>.
+    </p>
+  </section>
+
+  <!-- Main Content / Playground -->
+  <main id="playground" class="px-6 md:px-12 pb-24 max-w-7xl mx-auto w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- Left Column: Controls and Input -->
+    <div class="lg:col-span-8 space-y-6">
+      
+      <!-- Toolbar Panel -->
+      <div class="glass-panel p-4 flex flex-wrap items-center justify-between gap-4">
+        
+        <!-- Mode Tabs -->
+        <div class="flex bg-gray-950/60 p-1 rounded-lg border border-gray-800">
+          <button id="mode-code-btn" class="segment-tab active px-4 py-1.5 rounded-md text-sm font-medium text-gray-400 hover:text-white">
+            Cmp++ Code Dialect
+          </button>
+          <button id="mode-semantic-btn" class="segment-tab px-4 py-1.5 rounded-md text-sm font-medium text-gray-400 hover:text-white">
+            Semantic Prompting
+          </button>
+        </div>
+
+        <!-- Tokenizer / Options -->
+        <div class="flex items-center gap-3">
+          <label for="tokenizer-select" class="text-xs text-gray-400 font-medium">Model Profile:</label>
+          <select id="tokenizer-select" class="bg-gray-950/80 border border-gray-800 rounded-md text-xs px-3 py-1.5 text-gray-300 focus:outline-none focus:border-cyberIndigo">
+            <option value="gemini">Gemini 1.5/2.0 (SentencePiece)</option>
+            <option value="gpt4">GPT-4 (cl100k_base)</option>
+            <option value="claude">Claude / Llama</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Editor Panel -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Standard Input Card -->
+        <div class="glass-panel p-4 flex flex-col h-[400px]">
+          <div class="flex justify-between items-center mb-3">
+            <span id="input-label" class="text-sm font-semibold text-gray-300 flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyberIndigo"></span>
+              Standard C++ Code
+            </span>
+            <div class="flex gap-2">
+              <select id="example-select" class="bg-gray-900 border border-gray-800 text-xs rounded px-2 py-1 text-gray-400 focus:outline-none">
+                <option value="">Load Example...</option>
+                <!-- Examples populated dynamically -->
+              </select>
+            </div>
+          </div>
+          <textarea id="editor-input" class="w-full flex-grow bg-gray-950/40 font-mono-code text-xs text-indigo-200 border border-indigo-950/40 rounded-lg p-3 overflow-y-auto focus:border-cyberIndigo" placeholder="Enter standard C++ code here..."></textarea>
+          <div class="mt-2 flex justify-between text-xs text-gray-500">
+            <span id="input-char-count">Chars: 0</span>
+            <span id="input-token-count" class="font-bold text-gray-400">Tokens: 0</span>
+          </div>
+        </div>
+
+        <!-- Cmp++ Output Card -->
+        <div class="glass-panel p-4 flex flex-col h-[400px]">
+          <div class="flex justify-between items-center mb-3">
+            <span class="text-sm font-semibold text-cyberCyan flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyberCyan"></span>
+              Cmp++ Optimized Code
+            </span>
+            <button id="copy-btn" class="text-xs text-gray-400 hover:text-white transition flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+              Copy
+            </button>
+          </div>
+          <textarea id="editor-output" class="w-full flex-grow bg-gray-950/60 font-mono-code text-xs text-cyan-200 border border-cyan-950/40 rounded-lg p-3 overflow-y-auto focus:border-cyberCyan" placeholder="Compiled Cmp++ output..."></textarea>
+          <div class="mt-2 flex justify-between text-xs text-gray-500">
+            <span id="output-char-count">Chars: 0</span>
+            <span id="output-token-count" class="font-bold text-cyberCyan">Tokens: 0</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Command Buttons -->
+      <div class="flex justify-between items-center gap-4">
+        <div class="flex gap-3">
+          <button id="compile-btn" class="btn-neon-primary px-6 py-2.5 rounded-lg text-sm font-semibold text-white flex items-center gap-2">
+            <span>Transpile to Cmp++</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+          </button>
+          <button id="decompile-btn" class="btn-neon-secondary px-6 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path></svg>
+            <span>Decompress to C++</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Execution Terminal (Cmp++ CLI runner info) -->
+      <div id="terminal-container" class="glass-panel p-4 flex flex-col h-40 border-emerald-950/40">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            Cmp++ Local Compilation Guide
+          </span>
+        </div>
+        <div id="terminal-output" class="flex-grow bg-black/90 rounded-lg p-3 font-mono-code text-2xs text-emerald-300 overflow-y-auto whitespace-pre-wrap">Cmp++ is compiled locally to machine code using standard compilers.
+To transpile and compile this code, run this command in your project directory:
+
+<span class="text-white font-bold">$ node cmppp.js main.cmp -run</span>
+
+Parameters:
+  -run  : Transpiles main.cmp to main.cpp, runs g++ (automatically linking Raylib on macOS) and executes immediately.
+  -o    : Set custom output binary name (e.g. -o my_app).</div>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Analytics & Savings Gauge -->
+    <div id="analytics" class="lg:col-span-4 space-y-6">
+      
+      <!-- Savings Circle Panel -->
+      <div class="glass-panel p-6 flex flex-col items-center justify-center text-center">
+        <h3 class="text-sm font-semibold text-gray-400 mb-4 uppercase tracking-wider">Token Reduction</h3>
+        
+        <div class="relative w-40 h-40 flex items-center justify-center mb-4">
+          <svg class="w-full h-full">
+            <circle class="text-gray-800" stroke-width="8" stroke="currentColor" fill="transparent" r="70" cx="80" cy="80" />
+            <circle id="gauge-ring" class="progress-ring__circle text-cyberCyan" stroke-width="8" stroke-dasharray="440" stroke-dashoffset="440" stroke-linecap="round" stroke="currentColor" fill="transparent" r="70" cx="80" cy="80" />
+          </svg>
+          <div class="absolute flex flex-col items-center">
+            <span id="reduction-percentage" class="text-4xl font-extrabold tracking-tight text-white glow-text-cyan">0%</span>
+            <span class="text-2xs text-gray-400 uppercase tracking-widest mt-1">SAVINGS</span>
+          </div>
+        </div>
+
+        <p id="savings-tagline" class="text-xs text-gray-400 italic">Load or type an example to analyze token reduction.</p>
+      </div>
+
+      <!-- Cost / Efficiency Stats -->
+      <div class="glass-panel p-5 space-y-4">
+        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider border-b border-indigo-950/40 pb-2">Resource Metrics</h3>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-gray-950/40 rounded-lg p-3 border border-indigo-950/20">
+            <div class="text-2xs text-gray-500 font-semibold uppercase">Original Tokens</div>
+            <div id="stats-orig-tokens" class="text-lg font-bold text-gray-300">0</div>
+          </div>
+          <div class="bg-gray-950/40 rounded-lg p-3 border border-indigo-950/20">
+            <div class="text-2xs text-gray-500 font-semibold uppercase">Cmp++ Tokens</div>
+            <div id="stats-cmp-tokens" class="text-lg font-bold text-cyberCyan">0</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-gray-950/40 rounded-lg p-3 border border-indigo-950/20">
+            <div class="text-2xs text-gray-500 font-semibold uppercase">Byte size (UTF-8)</div>
+            <div class="text-xs text-gray-300">
+              <span id="stats-orig-bytes">0</span>B $\rightarrow$ <span id="stats-cmp-bytes" class="text-cyberCyan font-semibold">0</span>B
+            </div>
+            <div id="stats-byte-saving" class="text-3xs text-emerald-400 font-medium mt-1">0% smaller</div>
+          </div>
+          <div class="bg-gray-950/40 rounded-lg p-3 border border-indigo-950/20">
+            <div class="text-2xs text-gray-500 font-semibold uppercase">Est. Cost / 1M queries</div>
+            <div class="text-xs text-gray-300">
+              $<span id="stats-orig-cost">0.00</span> $\rightarrow$ <span class="text-emerald-400 font-semibold">$<span id="stats-cmp-cost">0.00</span></span>
+            </div>
+            <div id="stats-cost-saving" class="text-3xs text-emerald-400 font-medium mt-1">Save $0.00</div>
+          </div>
+        </div>
+
+        <div class="text-4xs text-gray-500 border-t border-indigo-950/25 pt-2 text-center">
+          *Estimates based on input cost of $2.50 per 1M tokens.
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Section: Specifications & Cheat Sheet -->
+  <section id="documentation" class="bg-gray-950/40 border-t border-indigo-950/40 py-16 px-6 md:px-12">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold mb-4 tracking-tight">Cmp++ Dialect Specification</h2>
+        <p class="text-gray-400 max-w-xl mx-auto text-sm">
+          Cmp++ targets standard compiled C++ (supporting templates, stream I/O, vectors, and memory pointers) using dense symbols.
+        </p>
+      </div>
+
+      <!-- Specification Cards Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Grammatical Spec -->
+        <div class="glass-panel p-6 space-y-4">
+          <h3 class="text-lg font-bold text-cyberCyan flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyberCyan"></span>
+            1. C++ Include & Layout
+          </h3>
+          <p class="text-xs text-gray-400">
+            Compressed headers and main entry syntax:
+          </p>
+          <div class="overflow-x-auto text-xs">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Standard C++</th>
+                  <th>Cmp++ Dialect</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Includes</td>
+                  <td><code>#include &lt;vector&gt; &lt;raylib.h&gt;</code></td>
+                  <td><code>#i vec rl</code></td>
+                </tr>
+                <tr>
+                  <td>Main Entry</td>
+                  <td><code>int main() { ... }</code></td>
+                  <td><code>i_m { ... }</code></td>
+                </tr>
+                <tr>
+                  <td>Return Type</td>
+                  <td><code>return 0;</code></td>
+                  <td><code>→ 0</code> or <code>rt 0</code></td>
+                </tr>
+                <tr>
+                  <td>Output stream</td>
+                  <td><code>std::cout &lt;&lt; val;</code></td>
+                  <td><code>out &lt;&lt; val</code></td>
+                </tr>
+                <tr>
+                  <td>Input stream</td>
+                  <td><code>std::cin &gt;&gt; var;</code></td>
+                  <td><code>in &gt;&gt; var</code></td>
+                </tr>
+                <tr>
+                  <td>Stream end line</td>
+                  <td><code>std::endl;</code></td>
+                  <td><code>el</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Types Spec -->
+        <div class="glass-panel p-6 space-y-4">
+          <h3 class="text-lg font-bold text-cyberPurple flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyberPurple"></span>
+            2. C++ Types & Loops
+          </h3>
+          <p class="text-xs text-gray-400">
+            Compressed types, containers, pointers, and loop structures:
+          </p>
+          <div class="overflow-x-auto text-xs">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Type / Operator</th>
+                  <th>Standard C++</th>
+                  <th>Cmp++ Dialect</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Auto reference</td>
+                  <td><code>const auto&amp;</code></td>
+                  <td><code>c&amp;</code></td>
+                </tr>
+                <tr>
+                  <td>Vector / String</td>
+                  <td><code>std::vector&lt;T&gt;, std::string</code></td>
+                  <td><code>v&lt;T&gt;, str</code></td>
+                </tr>
+                <tr>
+                  <td>Smart Pointers</td>
+                  <td><code>std::shared_ptr&lt;T&gt;, nullptr</code></td>
+                  <td><code>sp&lt;T&gt;, Ø</code></td>
+                </tr>
+                <tr>
+                  <td>Loops</td>
+                  <td><code>for, while</code></td>
+                  <td><code>⟳, ⟲</code></td>
+                </tr>
+                <tr>
+                  <td>Conditionals</td>
+                  <td><code>if, else</code></td>
+                  <td><code>?, |</code></td>
+                </tr>
+                <tr>
+                  <td>STL Actions</td>
+                  <td><code>std::sort(x.begin(), x.end())</code></td>
+                  <td><code>srt(x)</code></td>
+                </tr>
+                <tr>
+                  <td>Vector push</td>
+                  <td><code>x.push_back(val)</code></td>
+                  <td><code>x.pb(val)</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Raylib Graphics Spec -->
+        <div class="glass-panel p-6 space-y-4">
+          <h3 class="text-lg font-bold text-cyberCyan flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyberCyan"></span>
+            3. Raylib GUI Shorthands
+          </h3>
+          <p class="text-xs text-gray-400">
+            GUI window creation, key interactions, drawing shapes, and FPS management:
+          </p>
+          <div class="overflow-x-auto text-xs">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Action</th>
+                  <th>Raylib C++</th>
+                  <th>Cmp++ Shorthand</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Create Window</td>
+                  <td><code>InitWindow(w, h, title)</code></td>
+                  <td><code>init_w(w, h, title)</code></td>
+                </tr>
+                <tr>
+                  <td>Close Condition</td>
+                  <td><code>WindowShouldClose()</code></td>
+                  <td><code>w_close()</code></td>
+                </tr>
+                <tr>
+                  <td>Render Bounds</td>
+                  <td><code>BeginDrawing(), EndDrawing()</code></td>
+                  <td><code>draw_b(), draw_e()</code></td>
+                </tr>
+                <tr>
+                  <td>Clear Screen</td>
+                  <td><code>ClearBackground(color)</code></td>
+                  <td><code>bg_cls(color)</code></td>
+                </tr>
+                <tr>
+                  <td>Draw Rect / Circle</td>
+                  <td><code>DrawRectangle(...), DrawCircle(...)</code></td>
+                  <td><code>draw_rect(...), draw_circ(...)</code></td>
+                </tr>
+                <tr>
+                  <td>Draw Text</td>
+                  <td><code>DrawText(text, x, y, size, col)</code></td>
+                  <td><code>draw_txt(text, x, y, size, col)</code></td>
+                </tr>
+                <tr>
+                  <td>Keys checking</td>
+                  <td><code>IsKeyPressed(k), IsKeyDown(k)</code></td>
+                  <td><code>key_p(k), key_d(k)</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-indigo-950/20 bg-gray-950 py-8 px-6 md:px-12 text-center text-xs text-gray-500">
+    <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <div>
+        <p>© 2026 Cmp++ Project. Designed for Ultra-low latency and low-cost AI inferences.</p>
+      </div>
+      <div class="flex gap-4">
+        <a href="#playground" class="hover:underline">Playground</a>
+        <a href="#documentation" class="hover:underline">Documentation</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core Scripts -->
+  <script src="cmp_tokenizer.js"></script>
+  <script src="cmp_compiler.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+#i rl math vec str
+
+# Struct for particles in scene
+struct Particle {
+    fl x;
+    fl y;
+    fl speed;
+    fl size;
+};
+
+i_m {
+    int screenW = 600;
+    int screenH = 450;
+
+    init_w(screenW, screenH, "Cmp++ Bad Apple Procedural Visualizer");
+    set_fps(60);
+
+    # Variables for state
+    fl time = 0.0f;
+    # inverted determines background colors: White vs Black
+    bool inverted = false;
+
+    # Initialize star particles for scene 3
+    v<Particle> stars;
+    ⟳ (int idx = 0; idx < 30; idx++) {
+        stars.pb(Particle{
+            sc<fl>(ran() % screenW),
+            sc<fl>(ran() % screenH),
+            sc<fl>((ran() % 8) + 4),
+            sc<fl>((ran() % 3) + 2),
+        });
+    }
+
+    ⟲ (!w_close()) {
+        # Increment time
+        time += GetFrameTime();
+
+        # Loop time at 12.0 seconds to restart the song cycle
+        ? (time > 12.0f) {
+            time = 0.0f;
+            inverted = false;
+        }
+
+        # Drawing block
+        draw_b()
+
+        # Phase control
+        ? (time < 2.5f) {
+            # Scene 1: Apple Drop on White
+            bg_cls(WHITE);
+
+            # Draw dropping rotating black apple
+            fl appleY = 100.0f + (time * 120.0f);
+            fl appleSize = 35.0f;
+            
+            # Apple body
+            draw_circ(screenW / 2, appleY, appleSize, BLACK);
+            draw_circ(screenW / 2 - 12, appleY - 8, appleSize * 0.9f, BLACK);
+            draw_circ(screenW / 2 + 12, appleY - 8, appleSize * 0.9f, BLACK);
+            
+            # Stem (represented as a curve of tiny circles)
+            ⟳ (int i = 0; i < 8; i++) {
+                draw_circ(screenW / 2 + i * 2, appleY - appleSize - i * 1.5f, 4.0f, BLACK);
+            }
+
+            # Apple leaf
+            draw_circ(screenW / 2 + 14, appleY - appleSize - 10, 6.0f, BLACK);
+            
+            # Lyrics
+            draw_txt("Nagareteku toki no naka de demo", screenW / 2 - 140, screenH - 50, 18, DARKGRAY);
+
+        } | ? (time >= 2.5f && time < 3.0f) {
+            # Screen shattering transition
+            inverted = true;
+            bg_cls(BLACK);
+            
+            # Shatter lines (expanding)
+            fl t = (time - 2.5f) * 2.0f;
+            draw_circ(screenW / 2, screenH / 2, t * 400.0f, WHITE);
+            
+            ⟳ (int i = 0; i < 8; i++) {
+                fl angle = i * 45.0f * (3.14159f / 180.0f);
+                fl endX = screenW / 2 + cos(angle) * (t * 500.0f);
+                fl endY = screenH / 2 + sin(angle) * (t * 500.0f);
+                DrawLineEx(Vector2{sc<fl>(screenW / 2), sc<fl>(screenH / 2)}, Vector2{endX, endY}, 3.0f, BLACK);
+            }
+
+        } | ? (time >= 3.0f && time < 6.5f) {
+            # Scene 2: Reimu head silhouette & spinning Yin-Yang
+            bg_cls(BLACK);
+
+            # 1. Spin Yin-Yang symbol in background (Large, gray)
+            fl yyX = 150.0f;
+            fl yyY = 220.0f;
+            fl yyR = 90.0f;
+            fl rot = time * 2.0f;
+            
+            draw_circ(yyX, yyY, yyR, DARKGRAY);
+            # Yin-Yang halves
+            DrawCircleSector(Vector2{yyX, yyY}, yyR, rot * (180.0f/3.14f), (rot + 3.14159f) * (180.0f/3.14f), 0, LIGHTGRAY);
+            draw_circ(yyX + cos(rot)*yyR/2, yyY + sin(rot)*yyR/2, yyR/2, LIGHTGRAY);
+            draw_circ(yyX + cos(rot+3.14f)*yyR/2, yyY + sin(rot+3.14f)*yyR/2, yyR/2, DARKGRAY);
+            draw_circ(yyX + cos(rot)*yyR/2, yyY + sin(rot)*yyR/2, 8.0f, DARKGRAY);
+            draw_circ(yyX + cos(rot+3.14f)*yyR/2, yyY + sin(rot+3.14f)*yyR/2, 8.0f, LIGHTGRAY);
+
+            # 2. Draw Reimu Silhouette (White)
+            # Center of silhouette
+            fl rX = 400.0f;
+            fl rY = 250.0f;
+            
+            # Ribbon (Back Bow)
+            draw_rect(rX - 80, rY - 60, 45, 30, WHITE);
+            draw_rect(rX - 80, rY - 30, 30, 45, WHITE);
+            
+            # Hair (flowing back)
+            draw_rect(rX - 60, rY - 20, 50, 110, WHITE);
+            DrawTriangle(Vector2{rX - 50, rY + 80}, Vector2{rX - 70, rY + 120}, Vector2{rX - 10, rY + 80}, WHITE);
+            
+            # Head/Face
+            draw_circ(rX - 15, rY - 10, 40, WHITE);
+            # chin
+            DrawTriangle(Vector2{rX - 15, rY + 25}, Vector2{rX + 25, rY - 10}, Vector2{rX + 15, rY + 20}, WHITE);
+            
+            # Bow tie in front
+            draw_circ(rX + 15, rY + 45, 12, WHITE);
+            
+            # Torso
+            draw_rect(rX - 50, rY + 50, 80, 120, WHITE);
+
+            # Lyrics
+            draw_txt("Kedarusage hora guruguru mawatte", screenW / 2 - 165, screenH - 50, 18, LIGHTGRAY);
+
+        } | {
+            # Scene 3: Marisa Witch riding Broom
+            bg_cls(BLACK);
+
+            # 1. Update and draw star field
+            ⟳ (auto& star : stars) {
+                star.x -= star.speed;
+                ? (star.x < -10) {
+                    star.x = screenW + 10;
+                    star.y = ran() % screenH;
+                }
+                draw_rect(star.x, star.y, star.size, star.size, WHITE);
+            }
+
+            # 2. Draw Marisa Silhouette (White, hovering with sine wave)
+            fl mX = 250.0f;
+            fl mY = 200.0f + sin(time * 6.0f) * 18.0f;
+
+            # Broom stick
+            DrawLineEx(Vector2{mX - 130, mY + 60}, Vector2{mX + 130, mY + 20}, 6.0f, WHITE);
+            # Broom brush
+            DrawTriangle(Vector2{mX - 110, mY + 55}, Vector2{mX - 170, mY + 80}, Vector2{mX - 160, mY + 40}, WHITE);
+
+            # Witch Hat
+            # Hat cone
+            DrawTriangle(Vector2{mX, mY - 60}, Vector2{mX - 35, mY - 10}, Vector2{mX + 35, mY - 10}, WHITE);
+            # Brim
+            DrawRectangle(mX - 45, mY - 12, 90, 8, WHITE);
+
+            # Head
+            draw_circ(mX, mY + 15, 25, WHITE);
+
+            # Hair
+            draw_rect(mX - 25, mY + 15, 45, 55, WHITE);
+
+            # Body / Cloak
+            DrawTriangle(Vector2{mX - 30, mY + 110}, Vector2{mX, mY + 45}, Vector2{mX + 25, mY + 110}, WHITE);
+            draw_rect(mX - 20, mY + 50, 45, 50, WHITE);
+
+            # Lyrics
+            draw_txt("Watashi no kokoro mo shinteyuku no ka na", screenW / 2 - 180, screenH - 50, 18, LIGHTGRAY);
+        }
+
+        # Subtitle overlay frame (pure black background bar for lyrics text contrast)
+        draw_rect(0, screenH - 70, screenW, 4, inverted ? WHITE : BLACK);
+        draw_txt("BAD APPLE!! - Cmp++ Graphic Demo", 15, 15, 14, GRAY);
+
+        draw_e()
+    }
+
+    → 0
+}
