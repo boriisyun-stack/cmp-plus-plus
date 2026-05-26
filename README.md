@@ -52,7 +52,7 @@ Alternatively, you can open `index.html` directly in any browser and use the san
 
 ## 🎮 Game Demonstrations
 
-We have implemented two fully functioning graphical programs to prove Cmp++'s capabilities:
+We have implemented a fully functioning graphical program to prove Cmp++'s capabilities:
 
 ### 1. Snake Game (`snake.cmp`)
 A classic Snake game written entirely in Cmp++ using Raylib.
@@ -60,14 +60,6 @@ A classic Snake game written entirely in Cmp++ using Raylib.
 - Execute:
   ```bash
   node cmppp.js snake.cmp -run
-  ```
-
-### 2. Bad Apple Pure ASCII Console Visualizer (`badapple_ascii.cmp`)
-A dependency-free terminal ASCII rendering of the Bad Apple visualization.
-- Features: Custom character-graphics buffer engine, retro console aesthetics, falling apples, spinning Yin-Yang, Reimu/Marisa character-art silhouette animations, glass shattering effects, and terminal-printed lyrics.
-- Execute:
-  ```bash
-  node cmppp.js badapple_ascii.cmp -run
   ```
 
 ---
