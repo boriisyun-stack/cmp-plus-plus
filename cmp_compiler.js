@@ -531,6 +531,7 @@ const CmpCompiler = {
     let loopLines = [];
     let isInsideLoop = false;
     let braceCount = 0;
+    let hasFinishedLoop = false;
     
     // Parse struct definitions first to map object constructs
     let structFields = {};
@@ -575,11 +576,12 @@ const CmpCompiler = {
         }
         if (braceCount <= 0) {
           isInsideLoop = false;
+          hasFinishedLoop = true;
           continue;
         }
         loopLines.push(line);
       } else {
-        if (trimmed === '}' && setupLines.length > 5 && !trimmed.includes('{')) {
+        if (hasFinishedLoop) {
           continue;
         }
         setupLines.push(line);
@@ -608,7 +610,14 @@ const CmpCompiler = {
         .replace(/\bstd::vector\s*<\s*[^>]+\s*>\s*(\w+)/g, 'let $1 = []')
         .replace(/⟳/g, 'for')
         .replace(/⟲/g, 'while')
-        .replace(/\?/g, 'if')
+        .replace(/^(\s*)(\}\s*\|\s*)?(\|\s*)?\?\s*([^→{]+)/g, (match, indent, braceElse, elsePrefix, cond) => {
+          let p = indent + (braceElse ? "} else " : "") + (elsePrefix ? "else " : "");
+          let c = cond.trim();
+          if (c.startsWith("(") && c.endsWith(")")) {
+            return `${p}if ${c} `;
+          }
+          return `${p}if (${c}) `;
+        })
         .replace(/\|/g, 'else')
         .replace(/→/g, 'return')
         .replace(/for\s*\(([^:]+):([^)]+)\)/g, (m, left, right) => {
@@ -629,7 +638,8 @@ const CmpCompiler = {
         .replace(/\bcos\b/g, 'Math.cos')
         .replace(/\bsin\b/g, 'Math.sin')
         .replace(/Vector2\s*\{\s*([^,]+)\s*,\s*([^}]+)\}/g, '{x: $1, y: $2}')
-        .replace(/Ø/g, 'null');
+        .replace(/Ø/g, 'null')
+        .replace(/\b(\d+(?:\.\d+)?)f\b/g, '$1');
         
       for (let sName in structFields) {
         let fields = structFields[sName];

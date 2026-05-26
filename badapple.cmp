@@ -2,11 +2,34 @@
 #i math
 #i vec
 #i str
+#i cstd
 
 st Prt {
     fl x
     fl y
+    fl vx
+    fl vy
     fl speed
+    fl size
+    fl alpha
+}
+
+st Shd {
+    fl x
+    fl y
+    fl vx
+    fl vy
+    fl angle
+    fl rotSpeed
+    fl size
+}
+
+st Ptl {
+    fl x
+    fl y
+    fl speed
+    fl angle
+    fl waveSpeed
     fl size
 }
 
@@ -20,96 +43,144 @@ i_m {
     fl tm = 0.0f
     bl iv = fs
 
-    v<Prt> sts
-    ⟳ (it idx = 0; idx < 30; idx++) {
-        sts.pb(Prt{
-            sc<fl>(ran() % sW),
-            sc<fl>(ran() % sH),
-            sc<fl>((ran() % 8) + 4),
-            sc<fl>((ran() % 3) + 2),
-        })
+    v<Prt> dst
+    ⟳ (it i = 0; i < 30; i++) {
+        dst.pb(Prt{sc<fl>(ran() % sW), sc<fl>(ran() % sH), 0.0f, -sc<fl>((ran() % 15 + 5) / 10.0f), 0.0f, sc<fl>(ran() % 3 + 1), sc<fl>((ran() % 50 + 50) / 100.0f)})
     }
 
-    ⟲ (!w_close()) {
-        tm += dt()
+    v<Prt> sts
+    ⟳ (it i = 0; i < 30; i++) {
+        sts.pb(Prt{sc<fl>(ran() % sW), sc<fl>(ran() % sH), -sc<fl>((ran() % 8) + 4), 0.0f, 0.0f, sc<fl>((ran() % 3) + 2), 1.0f})
+    }
 
-        ? (tm > 12.0f) {
+    v<Prt> trl
+
+    v<Shd> shd
+
+    v<Ptl> ptl
+    ⟳ (it i = 0; i < 25; i++) {
+        ptl.pb(Ptl{sc<fl>(ran() % sW), sc<fl>(ran() % sH - sH), sc<fl>((ran() % 15 + 5) / 10.0f), sc<fl>(ran() % 360), sc<fl>((ran() % 20 + 10) / 10.0f), sc<fl>((ran() % 4) + 3)})
+    }
+
+    bl sI = fs
+
+    ⟲ (!w_close()) {
+        fl d = dt()
+        tm += d
+
+        ? (tm > 15.0f) {
             tm = 0.0f
             iv = fs
+            sI = fs
+            shd.clear()
         }
 
         draw_b()
 
-        ? (tm < 2.5f) {
+        ? (tm < 2.0f) {
+            bg_cls(BLK)
+            ⟳ (auto& d_ : dst) {
+                d_.y += d_.vy
+                ? (d_.y < 0) {
+                    d_.y = sH
+                    d_.x = ran() % sW
+                }
+                circ(d_.x, d_.y, d_.size, fade(WHT, d_.alpha))
+            }
+            fl alpha = sin((tm / 2.0f) * 3.14159f)
+            text("BAD APPLE!!", sW / 2 - 100, sH / 2 - 20, 36, fade(WHT, alpha))
+            text("Cmp++ Premium Demo", sW / 2 - 80, sH / 2 + 30, 16, fade(GRAY, alpha))
+            text("Nagareteku toki no naka de demo", sW / 2 - 140, sH - 50, 18, fade(DKGY, alpha))
+
+        } | ? (tm >= 2.0f && tm < 5.0f) {
             bg_cls(WHT)
-
-            fl aY = 100.0f + (tm * 120.0f)
-            fl aS = 35.0f
-
-            circ(sW / 2, aY, aS, BLK)
-            circ(sW / 2 - 12, aY - 8, aS * 0.9f, BLK)
-            circ(sW / 2 + 12, aY - 8, aS * 0.9f, BLK)
-
-            ⟳ (it i = 0; i < 8; i++) {
-                circ(sW / 2 + i * 2, aY - aS - i * 1.5f, 4.0f, BLK)
+            
+            fl t = tm - 2.0f
+            fl aY = -50.0f
+            fl aX = sW / 2
+            fl rot = t * 4.0f
+            
+            ? (t < 1.5f) {
+                aY = -50.0f + (t / 1.5f) * (sH / 2 + 50.0f)
+            } | {
+                aY = sH / 2
+                fl bT = t - 1.5f
+                aY += sin(bT * 15.0f) * 30.0f * exp(-bT * 3.0f)
             }
 
-            circ(sW / 2 + 14, aY - aS - 10, 6.0f, BLK)
+            fl aS = 40.0f
+
+            circ(aX + cos(rot) * -5.0f, aY + sin(rot) * -5.0f, aS, BLK)
+            circ(aX - 12 + cos(rot + 1.0f) * 5.0f, aY - 8 + sin(rot + 1.0f) * 5.0f, aS * 0.9f, BLK)
+            circ(aX + 12 - cos(rot + 1.0f) * 5.0f, aY - 8 - sin(rot + 1.0f) * 5.0f, aS * 0.9f, BLK)
+
+            ⟳ (it i = 0; i < 8; i++) {
+                circ(aX + i * 2 + cos(rot + 2.0f) * 10.0f, aY - aS - i * 1.5f + sin(rot + 2.0f) * 10.0f, 4.0f, BLK)
+            }
+            circ(aX + 14 + cos(rot + 2.5f) * 12.0f, aY - aS - 10 + sin(rot + 2.5f) * 12.0f, 6.0f, BLK)
+
+            ? (t >= 1.5f) {
+                fl sT = t - 1.5f
+                fl rd = sT * 400.0f
+                ? (rd < sW) {
+                    sect(Vector2{sc<fl>(sW / 2), aY}, rd, 0, 360, 0, fade(BLK, 0.4f * (1.0f - sT)))
+                    sect(Vector2{sc<fl>(sW / 2), aY}, rd - 6.0f, 0, 360, 0, WHT)
+                }
+            }
 
             text("Nagareteku toki no naka de demo", sW / 2 - 140, sH - 50, 18, DKGY)
 
-        } | ? (tm >= 2.5f && tm < 3.0f) {
-            iv = tr
+        } | ? (tm >= 5.0f && tm < 8.0f) {
             bg_cls(BLK)
 
-            fl t = (tm - 2.5f) * 2.0f
-            circ(sW / 2, sH / 2, t * 400.0f, WHT)
-
-            ⟳ (it i = 0; i < 8; i++) {
-                fl angle = i * 45.0f * (3.14159f / 180.0f)
-                fl endX = sW / 2 + cos(angle) * (t * 500.0f)
-                fl endY = sH / 2 + sin(angle) * (t * 500.0f)
-                line(Vector2{sc<fl>(sW / 2), sc<fl>(sH / 2)}, Vector2{endX, endY}, 3.0f, BLK)
-            }
-
-        } | ? (tm >= 3.0f && tm < 6.5f) {
-            bg_cls(BLK)
-
+            fl rot = tm * 3.0f
             fl yyX = 150.0f
             fl yyY = 220.0f
-            fl yyR = 90.0f
-            fl rot = tm * 2.0f
+            fl yyR = 80.0f
 
             circ(yyX, yyY, yyR, DKGY)
-            sect(Vector2{yyX, yyY}, yyR, rot * (180.0f/3.14f), (rot + 3.14159f) * (180.0f/3.14f), 0, LTGY)
-            circ(yyX + cos(rot)*yyR/2, yyY + sin(rot)*yyR/2, yyR/2, LTGY)
-            circ(yyX + cos(rot+3.14f)*yyR/2, yyY + sin(rot+3.14f)*yyR/2, yyR/2, DKGY)
-            circ(yyX + cos(rot)*yyR/2, yyY + sin(rot)*yyR/2, 8.0f, DKGY)
-            circ(yyX + cos(rot+3.14f)*yyR/2, yyY + sin(rot+3.14f)*yyR/2, 8.0f, LTGY)
+            sect(Vector2{yyX, yyY}, yyR, rot * (180.0f / 3.14159f), (rot + 3.14159f) * (180.0f / 3.14159f), 0, LTGY)
+            circ(yyX + cos(rot) * yyR / 2, yyY + sin(rot) * yyR / 2, yyR / 2, LTGY)
+            circ(yyX + cos(rot + 3.14159f) * yyR / 2, yyY + sin(rot + 3.14159f) * yyR / 2, yyR / 2, DKGY)
+            circ(yyX + cos(rot) * yyR / 2, yyY + sin(rot) * yyR / 2, 8.0f, DKGY)
+            circ(yyX + cos(rot + 3.14159f) * yyR / 2, yyY + sin(rot + 3.14159f) * yyR / 2, 8.0f, LTGY)
+
+            ⟳ (it i = 0; i < 12; i++) {
+                fl ag = i * (360.0f / 12.0f) * (3.14159f / 180.0f) - rot * 0.5f
+                fl rx = yyX + cos(ag) * (yyR + 25.0f)
+                fl ry = yyY + sin(ag) * (yyR + 25.0f)
+                circ(rx, ry, 4.0f, LTGY)
+            }
 
             fl rX = 400.0f
-            fl rY = 250.0f
+            fl rY = 230.0f
+            fl wv = sin(tm * 8.0f) * 8.0f
 
-            rect(rX - 80, rY - 60, 45, 30, WHT)
-            rect(rX - 80, rY - 30, 30, 45, WHT)
+            rect(rX - 80, rY - 60 + wv * 0.5f, 45, 30, WHT)
+            rect(rX - 80, rY - 30 + wv * 0.3f, 30, 45, WHT)
 
-            rect(rX - 60, rY - 20, 50, 110, WHT)
-            tri(Vector2{rX - 50, rY + 80}, Vector2{rX - 70, rY + 120}, Vector2{rX - 10, rY + 80}, WHT)
+            rect(rX - 60, rY - 20, 50, 100 + wv, WHT)
+            tri(Vector2{rX - 50, rY + 80 + wv}, Vector2{rX - 70, rY + 120 + wv}, Vector2{rX - 10, rY + 80 + wv}, WHT)
 
             circ(rX - 15, rY - 10, 40, WHT)
             tri(Vector2{rX - 15, rY + 25}, Vector2{rX + 25, rY - 10}, Vector2{rX + 15, rY + 20}, WHT)
 
             circ(rX + 15, rY + 45, 12, WHT)
 
-            rect(rX - 50, rY + 50, 80, 120, WHT)
+            fl br = sin(tm * 4.0f) * 2.0f
+            rect(rX - 50, rY + 50 + br, 80, 120 - br, WHT)
+
+            fl aY = rY + 80.0f + sin(tm * 5.0f) * 20.0f
+            rect(rX + 60, aY, 15, 30, WHT)
+            rect(rX + 65, aY + 5, 5, 20, BLK)
 
             text("Kedarusage hora guruguru mawatte", sW / 2 - 165, sH - 50, 18, LTGY)
 
-        } | {
+        } | ? (tm >= 8.0f && tm < 11.0f) {
             bg_cls(BLK)
 
             ⟳ (auto& star : sts) {
-                star.x -= star.speed
+                star.x += star.vx
                 ? (star.x < -10) {
                     star.x = sW + 10
                     star.y = ran() % sH
@@ -119,6 +190,21 @@ i_m {
 
             fl mX = 250.0f
             fl mY = 200.0f + sin(tm * 6.0f) * 18.0f
+
+            ? (ran() % 3 == 0) {
+                trl.pb(Prt{mX - 140.0f, mY + 60.0f + (ran() % 10 - 5), -sc<fl>((ran() % 40 + 20) / 10.0f), sc<fl>((ran() % 20 - 10) / 10.0f), 0.0f, sc<fl>(ran() % 4 + 2), 1.0f})
+            }
+
+            ⟳ (it i = trl.size() - 1; i >= 0; i--) {
+                trl[i].x += trl[i].vx
+                trl[i].y += trl[i].vy
+                trl[i].alpha -= 0.02f
+                ? (trl[i].alpha <= 0.0f) {
+                    trl.erase(trl.begin() + i)
+                } | {
+                    circ(trl[i].x, trl[i].y, trl[i].size, fade(WHT, trl[i].alpha))
+                }
+            }
 
             line(Vector2{mX - 130, mY + 60}, Vector2{mX + 130, mY + 20}, 6.0f, WHT)
             tri(Vector2{mX - 110, mY + 55}, Vector2{mX - 170, mY + 80}, Vector2{mX - 160, mY + 40}, WHT)
@@ -134,10 +220,100 @@ i_m {
             rect(mX - 20, mY + 50, 45, 50, WHT)
 
             text("Watashi no kokoro mo shinteyuku no ka na", sW / 2 - 180, sH - 50, 18, LTGY)
+
+        } | ? (tm >= 11.0f && tm < 12.0f) {
+            iv = tr
+            bg_cls(BLK)
+
+            ? (!sI) {
+                sI = tr
+                shd.clear()
+                it cols = 5
+                it rows = 4
+                fl cW = sc<fl>(sW) / cols
+                fl cH = sc<fl>(sH) / rows
+                ⟳ (it r = 0; r < rows; r++) {
+                    ⟳ (it c = 0; c < cols; c++) {
+                        fl cx = c * cW + cW / 2.0f
+                        fl cy = r * cH + cH / 2.0f
+                        fl dx = cx - (sW / 2.0f)
+                        fl dy = cy - (sH / 2.0f)
+                        fl ds = sqrt(dx*dx + dy*dy)
+                        ? (ds == 0.0f) { ds = 1.0f; }
+                        fl fc = 120.0f + (ran() % 80)
+                        fl vx = (dx / ds) * fc
+                        fl vy = (dy / ds) * fc - 80.0f
+
+                        shd.pb(Shd{cx, cy, vx, vy, sc<fl>(ran() % 360), sc<fl>((ran() % 10 - 5)), cW * 0.7f})
+                        shd.pb(Shd{cx + 10.0f, cy + 10.0f, vx + (ran() % 40 - 20), vy + (ran() % 40 - 20), sc<fl>(ran() % 360), sc<fl>((ran() % 10 - 5)), cW * 0.7f})
+                    }
+                }
+            }
+
+            ⟳ (auto& s : shd) {
+                s.vy += 300.0f * d
+                s.x += s.vx * d
+                s.y += s.vy * d
+                s.angle += s.rotSpeed * d * 50.0f
+
+                fl a = s.angle * (3.14159f / 180.0f)
+                fl a1 = a
+                fl a2 = a + 2.09439f
+                fl a3 = a + 4.18879f
+
+                auto v1 = Vector2{s.x + cos(a1) * s.size, s.y + sin(a1) * s.size}
+                auto v2 = Vector2{s.x + cos(a2) * s.size, s.y + sin(a2) * s.size}
+                auto v3 = Vector2{s.x + cos(a3) * s.size, s.y + sin(a3) * s.size}
+
+                tri(v1, v2, v3, WHT)
+            }
+
+            text("Futei na koto mo shitteyuku no ka na", sW / 2 - 170, sH - 50, 18, LTGY)
+
+        } | {
+            bg_cls(BLK)
+
+            ⟳ (auto& p : ptl) {
+                p.y += p.speed
+                p.x += sin(tm * p.waveSpeed) * 1.2f
+                p.angle += p.speed * 2.0f
+                ? (p.y > sH) {
+                    p.y = -20
+                    p.x = ran() % sW
+                }
+
+                fl rad = p.angle * (3.14159f / 180.0f)
+                auto v1 = Vector2{p.x + cos(rad) * p.size, p.y + sin(rad) * p.size}
+                auto v2 = Vector2{p.x + cos(rad + 2.0f) * (p.size * 0.6f), p.y + sin(rad + 2.0f) * (p.size * 0.6f)}
+                auto v3 = Vector2{p.x + cos(rad - 2.0f) * (p.size * 0.6f), p.y + sin(rad - 2.0f) * (p.size * 0.6f)}
+                tri(v1, v2, v3, WHT)
+            }
+
+            line(Vector2{0, 0}, Vector2{120, 80}, 12.0f, DKGY)
+            line(Vector2{120, 80}, Vector2{200, 110}, 8.0f, DKGY)
+            line(Vector2{120, 80}, Vector2{160, 150}, 6.0f, DKGY)
+            line(Vector2{0, 0}, Vector2{60, 120}, 8.0f, DKGY)
+
+            circ(120, 80, 15, WHT)
+            circ(130, 90, 12, WHT)
+            circ(200, 110, 18, WHT)
+            circ(160, 150, 14, WHT)
+            circ(60, 120, 16, WHT)
+
+            fl fO = 1.0f
+            ? (tm > 14.0f) {
+                fO = 1.0f - (tm - 14.0f)
+            }
+
+            text("BAD APPLE!!", sW / 2 - 100, sH / 2 - 40, 36, fade(WHT, fO))
+            text("Cmp++ Engine Verification", sW / 2 - 110, sH / 2 + 10, 18, fade(GRAY, fO))
+            text("Thank you for watching!", sW / 2 - 95, sH / 2 + 40, 14, fade(LTGY, fO))
+
+            text("Tada yudane teku dake no sono koto", sW / 2 - 165, sH - 50, 18, fade(LTGY, fO))
         }
 
         rect(0, sH - 70, sW, 4, iv ? WHT : BLK)
-        text("BAD APPLE!! - Cmp++ Graphic Demo", 15, 15, 14, GRAY)
+        text("BAD APPLE!! - Cmp++ High-Fidelity Demo", 15, 15, 14, GRAY)
 
         draw_e()
     }

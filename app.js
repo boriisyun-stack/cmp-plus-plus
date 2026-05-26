@@ -49,7 +49,329 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       {
         name: "Bad Apple Procedural",
-        input: `#include <iostream>\n#include <vector>\n#include <cmath>\n#include <cstdlib>\n#include <raylib.h>\n\nstruct Particle {\n    float x;\n    float y;\n    float speed;\n    float size;\n};\n\nint main() {\n    int screenW = 600;\n    int screenH = 450;\n\n    InitWindow(screenW, screenH, "Cmp++ Bad Apple Procedural Visualizer");\n    SetTargetFPS(60);\n\n    float time = 0.0f;\n    bool inverted = false;\n\n    std::vector<Particle> stars;\n    for (int idx = 0; idx < 30; idx++) {\n        stars.push_back(Particle{\n            static_cast<float>(rand() % screenW),\n            static_cast<float>(rand() % screenH),\n            static_cast<float>((rand() % 8) + 4),\n            static_cast<float>((rand() % 3) + 2)\n        });\n    }\n\n    while (!WindowShouldClose()) {\n        time += GetFrameTime();\n        if (time > 12.0f) {\n            time = 0.0f;\n            inverted = false;\n        }\n\n        BeginDrawing();\n\n        if (time < 2.5f) {\n            ClearBackground(WHITE);\n            float appleY = 100.0f + (time * 120.0f);\n            float appleSize = 35.0f;\n            \n            DrawCircle(screenW / 2, appleY, appleSize, BLACK);\n            DrawCircle(screenW / 2 - 12, appleY - 8, appleSize * 0.9f, BLACK);\n            DrawCircle(screenW / 2 + 12, appleY - 8, appleSize * 0.9f, BLACK);\n            \n            for (int i = 0; i < 8; i++) {\n                DrawCircle(screenW / 2 + i * 2, appleY - appleSize - i * 1.5f, 4.0f, BLACK);\n            }\n            DrawCircle(screenW / 2 + 14, appleY - appleSize - 10, 6.0f, BLACK);\n            DrawText("Nagareteku toki no naka de demo", screenW / 2 - 140, screenH - 50, 18, DARKGRAY);\n        } else if (time >= 2.5f && time < 3.0f) {\n            inverted = true;\n            ClearBackground(BLACK);\n            float t = (time - 2.5f) * 2.0f;\n            DrawCircle(screenW / 2, screenH / 2, t * 400.0f, WHITE);\n            for (int i = 0; i < 8; i++) {\n                float angle = i * 45.0f * (3.14159f / 180.0f);\n                float endX = screenW / 2 + cos(angle) * (t * 500.0f);\n                float endY = screenH / 2 + sin(angle) * (t * 500.0f);\n                DrawLineEx(Vector2{static_cast<float>(screenW / 2), static_cast<float>(screenH / 2)}, Vector2{endX, endY}, 3.0f, BLACK);\n            }\n        } else if (time >= 3.0f && time < 6.5f) {\n            ClearBackground(BLACK);\n            float yyX = 150.0f; float yyY = 220.0f; float yyR = 90.0f; float rot = time * 2.0f;\n            DrawCircle(yyX, yyY, yyR, DARKGRAY);\n            DrawCircleSector(Vector2{yyX, yyY}, yyR, rot * (180.0f/3.14f), (rot + 3.14159f) * (180.0f/3.14f), 0, LIGHTGRAY);\n            DrawCircle(yyX + cos(rot)*yyR/2, yyY + sin(rot)*yyR/2, yyR/2, LIGHTGRAY);\n            DrawCircle(yyX + cos(rot+3.14f)*yyR/2, yyY + sin(rot+3.14f)*yyR/2, yyR/2, DARKGRAY);\n            DrawCircle(yyX + cos(rot)*yyR/2, yyY + sin(rot)*yyR/2, 8.0f, DARKGRAY);\n            DrawCircle(yyX + cos(rot+3.14f)*yyR/2, yyY + sin(rot+3.14f)*yyR/2, 8.0f, LIGHTGRAY);\n\n            float rX = 400.0f; float rY = 250.0f;\n            DrawRectangle(rX - 80, rY - 60, 45, 30, WHITE);\n            DrawRectangle(rX - 80, rY - 30, 30, 45, WHITE);\n            DrawRectangle(rX - 60, rY - 20, 50, 110, WHITE);\n            DrawTriangle(Vector2{rX - 50, rY + 80}, Vector2{rX - 70, rY + 120}, Vector2{rX - 10, rY + 80}, WHITE);\n            DrawCircle(rX - 15, rY - 10, 40, WHITE);\n            DrawTriangle(Vector2{rX - 15, rY + 25}, Vector2{rX + 25, rY - 10}, Vector2{rX + 15, rY + 20}, WHITE);\n            DrawCircle(rX + 15, rY + 45, 12, WHITE);\n            DrawRectangle(rX - 50, rY + 50, 80, 120, WHITE);\n            DrawText("Kedarusage hora guruguru mawatte", screenW / 2 - 165, screenH - 50, 18, LIGHTGRAY);\n        } else {\n            ClearBackground(BLACK);\n            for (auto& star : stars) {\n                star.x -= star.speed;\n                if (star.x < -10) {\n                    star.x = screenW + 10;\n                    star.y = rand() % screenH;\n                }\n                DrawRectangle(star.x, star.y, star.size, star.size, WHITE);\n            }\n            float mX = 250.0f; float mY = 200.0f + sin(time * 6.0f) * 18.0f;\n            DrawLineEx(Vector2{mX - 130, mY + 60}, Vector2{mX + 130, mY + 20}, 6.0f, WHITE);\n            DrawTriangle(Vector2{mX - 110, mY + 55}, Vector2{mX - 170, mY + 80}, Vector2{mX - 160, mY + 40}, WHITE);\n            DrawTriangle(Vector2{mX, mY - 60}, Vector2{mX - 35, mY - 10}, Vector2{mX + 35, mY - 10}, WHITE);\n            DrawRectangle(mX - 45, mY - 12, 90, 8, WHITE);\n            DrawCircle(mX, mY + 15, 25, WHITE);\n            DrawRectangle(mX - 25, mY + 15, 45, 55, WHITE);\n            DrawTriangle(Vector2{mX - 30, mY + 110}, Vector2{mX, mY + 45}, Vector2{mX + 25, mY + 110}, WHITE);\n            DrawRectangle(mX - 20, mY + 50, 45, 50, WHITE);\n            DrawText("Watashi no kokoro mo shinteyuku no ka na", screenW / 2 - 180, screenH - 50, 18, LIGHTGRAY);\n        }\n\n        DrawRectangle(0, screenH - 70, screenW, 4, inverted ? WHITE : BLACK);\n        DrawText("BAD APPLE!! - Cmp++ Graphic Demo", 15, 15, 14, GRAY);\n\n        EndDrawing();\n    }\n    return 0;\n}`
+        input: `#include <raylib.h>
+#include <cmath>
+#include <vector>
+#include <string>
+#include <cstdlib>
+
+struct Particle {
+    float x;
+    float y;
+    float vx;
+    float vy;
+    float speed;
+    float size;
+    float alpha;
+};
+
+struct Shd {
+    float x;
+    float y;
+    float vx;
+    float vy;
+    float angle;
+    float rotSpeed;
+    float size;
+};
+
+struct Ptl {
+    float x;
+    float y;
+    float speed;
+    float angle;
+    float waveSpeed;
+    float size;
+};
+
+int main() {
+    int screenW = 600;
+    int screenH = 450;
+
+    InitWindow(screenW, screenH, "Cmp++ Bad Apple Procedural Visualizer");
+    SetTargetFPS(60);
+
+    float time = 0.0f;
+    bool inverted = false;
+
+    std::vector<Particle> dst;
+    for (int i = 0; i < 30; i++) {
+        dst.push_back(Particle{static_cast<float>(rand() % screenW), static_cast<float>(rand() % screenH), 0.0f, -static_cast<float>((rand() % 15 + 5) / 10.0f), 0.0f, static_cast<float>(rand() % 3 + 1), static_cast<float>((rand() % 50 + 50) / 100.0f)});
+    }
+
+    std::vector<Particle> stars;
+    for (int i = 0; i < 30; i++) {
+        stars.push_back(Particle{static_cast<float>(rand() % screenW), static_cast<float>(rand() % screenH), -static_cast<float>((rand() % 8) + 4), 0.0f, 0.0f, static_cast<float>((rand() % 3) + 2), 1.0f});
+    }
+
+    std::vector<Particle> trl;
+
+    std::vector<Shd> shd;
+
+    std::vector<Ptl> ptl;
+    for (int i = 0; i < 25; i++) {
+        ptl.push_back(Ptl{static_cast<float>(rand() % screenW), static_cast<float>(rand() % screenH - screenH), static_cast<float>((rand() % 15 + 5) / 10.0f), static_cast<float>(rand() % 360), static_cast<float>((rand() % 20 + 10) / 10.0f), static_cast<float>((rand() % 4) + 3)});
+    }
+
+    bool sI = false;
+
+    while (!WindowShouldClose()) {
+        float d = GetFrameTime();
+        time += d;
+
+        if (time > 15.0f) {
+            time = 0.0f;
+            inverted = false;
+            sI = false;
+            shd.clear();
+        }
+
+        BeginDrawing();
+
+        if (time < 2.0f) {
+            ClearBackground(BLACK);
+            for (auto& d_ : dst) {
+                d_.y += d_.vy;
+                if (d_.y < 0) {
+                    d_.y = screenH;
+                    d_.x = rand() % screenW;
+                }
+                DrawCircle(d_.x, d_.y, d_.size, Fade(WHITE, d_.alpha));
+            }
+            float alpha = sin((time / 2.0f) * 3.14159f);
+            DrawText("BAD APPLE!!", screenW / 2 - 100, screenH / 2 - 20, 36, Fade(WHITE, alpha));
+            DrawText("Cmp++ Premium Demo", screenW / 2 - 80, screenH / 2 + 30, 16, Fade(GRAY, alpha));
+            DrawText("Nagareteku toki no naka de demo", screenW / 2 - 140, screenH - 50, 18, Fade(DARKGRAY, alpha));
+
+        } else if (time >= 2.0f && time < 5.0f) {
+            ClearBackground(WHITE);
+
+            float t = time - 2.0f;
+            float appleY = -50.0f;
+            float aX = screenW / 2;
+            float rot = t * 4.0f;
+
+            if (t < 1.5f) {
+                appleY = -50.0f + (t / 1.5f) * (screenH / 2 + 50.0f);
+            } else {
+                appleY = screenH / 2;
+                float bT = t - 1.5f;
+                appleY += sin(bT * 15.0f) * 30.0f * exp(-bT * 3.0f);
+            }
+
+            float appleSize = 40.0f;
+
+            DrawCircle(aX + cos(rot) * -5.0f, appleY + sin(rot) * -5.0f, appleSize, BLACK);
+            DrawCircle(aX - 12 + cos(rot + 1.0f) * 5.0f, appleY - 8 + sin(rot + 1.0f) * 5.0f, appleSize * 0.9f, BLACK);
+            DrawCircle(aX + 12 - cos(rot + 1.0f) * 5.0f, appleY - 8 - sin(rot + 1.0f) * 5.0f, appleSize * 0.9f, BLACK);
+
+            for (int i = 0; i < 8; i++) {
+                DrawCircle(aX + i * 2 + cos(rot + 2.0f) * 10.0f, appleY - appleSize - i * 1.5f + sin(rot + 2.0f) * 10.0f, 4.0f, BLACK);
+            }
+            DrawCircle(aX + 14 + cos(rot + 2.5f) * 12.0f, appleY - appleSize - 10 + sin(rot + 2.5f) * 12.0f, 6.0f, BLACK);
+
+            if (t >= 1.5f) {
+                float scoreText = t - 1.5f;
+                float rd = scoreText * 400.0f;
+                if (rd < screenW) {
+                    DrawCircleSector(Vector2{static_cast<float>(screenW / 2), appleY}, rd, 0, 360, 0, Fade(BLACK, 0.4f * (1.0f - scoreText)));
+                    DrawCircleSector(Vector2{static_cast<float>(screenW / 2), appleY}, rd - 6.0f, 0, 360, 0, WHITE);
+                }
+            }
+
+            DrawText("Nagareteku toki no naka de demo", screenW / 2 - 140, screenH - 50, 18, DARKGRAY);
+
+        } else if (time >= 5.0f && time < 8.0f) {
+            ClearBackground(BLACK);
+
+            float rot = time * 3.0f;
+            float yyX = 150.0f;
+            float yyY = 220.0f;
+            float yyR = 80.0f;
+
+            DrawCircle(yyX, yyY, yyR, DARKGRAY);
+            DrawCircleSector(Vector2{yyX, yyY}, yyR, rot * (180.0f / 3.14159f), (rot + 3.14159f) * (180.0f / 3.14159f), 0, LIGHTGRAY);
+            DrawCircle(yyX + cos(rot) * yyR / 2, yyY + sin(rot) * yyR / 2, yyR / 2, LIGHTGRAY);
+            DrawCircle(yyX + cos(rot + 3.14159f) * yyR / 2, yyY + sin(rot + 3.14159f) * yyR / 2, yyR / 2, DARKGRAY);
+            DrawCircle(yyX + cos(rot) * yyR / 2, yyY + sin(rot) * yyR / 2, 8.0f, DARKGRAY);
+            DrawCircle(yyX + cos(rot + 3.14159f) * yyR / 2, yyY + sin(rot + 3.14159f) * yyR / 2, 8.0f, LIGHTGRAY);
+
+            for (int i = 0; i < 12; i++) {
+                float ag = i * (360.0f / 12.0f) * (3.14159f / 180.0f) - rot * 0.5f;
+                float rx = yyX + cos(ag) * (yyR + 25.0f);
+                float ry = yyY + sin(ag) * (yyR + 25.0f);
+                DrawCircle(rx, ry, 4.0f, LIGHTGRAY);
+            }
+
+            float rX = 400.0f;
+            float rY = 230.0f;
+            float wv = sin(time * 8.0f) * 8.0f;
+
+            DrawRectangle(rX - 80, rY - 60 + wv * 0.5f, 45, 30, WHITE);
+            DrawRectangle(rX - 80, rY - 30 + wv * 0.3f, 30, 45, WHITE);
+
+            DrawRectangle(rX - 60, rY - 20, 50, 100 + wv, WHITE);
+            DrawTriangle(Vector2{rX - 50, rY + 80 + wv}, Vector2{rX - 70, rY + 120 + wv}, Vector2{rX - 10, rY + 80 + wv}, WHITE);
+
+            DrawCircle(rX - 15, rY - 10, 40, WHITE);
+            DrawTriangle(Vector2{rX - 15, rY + 25}, Vector2{rX + 25, rY - 10}, Vector2{rX + 15, rY + 20}, WHITE);
+
+            DrawCircle(rX + 15, rY + 45, 12, WHITE);
+
+            float br = sin(time * 4.0f) * 2.0f;
+            DrawRectangle(rX - 50, rY + 50 + br, 80, 120 - br, WHITE);
+
+            float appleY = rY + 80.0f + sin(time * 5.0f) * 20.0f;
+            DrawRectangle(rX + 60, appleY, 15, 30, WHITE);
+            DrawRectangle(rX + 65, appleY + 5, 5, 20, BLACK);
+
+            DrawText("Kedarusage hora guruguru mawatte", screenW / 2 - 165, screenH - 50, 18, LIGHTGRAY);
+
+        } else if (time >= 8.0f && time < 11.0f) {
+            ClearBackground(BLACK);
+
+            for (auto& star : stars) {
+                star.x += star.vx;
+                if (star.x < -10) {
+                    star.x = screenW + 10;
+                    star.y = rand() % screenH;
+                }
+                DrawRectangle(star.x, star.y, star.size, star.size, WHITE);
+            }
+
+            float mX = 250.0f;
+            float mY = 200.0f + sin(time * 6.0f) * 18.0f;
+
+            if (rand() % 3 == 0) {
+                trl.push_back(Particle{mX - 140.0f, mY + 60.0f + (rand() % 10 - 5), -static_cast<float>((rand() % 40 + 20) / 10.0f), static_cast<float>((rand() % 20 - 10) / 10.0f), 0.0f, static_cast<float>(rand() % 4 + 2), 1.0f});
+            }
+
+            for (int i = trl.size() - 1; i >= 0; i--) {
+                trl[i].x += trl[i].vx;
+                trl[i].y += trl[i].vy;
+                trl[i].alpha -= 0.02f;
+                if (trl[i].alpha <= 0.0f) {
+                    trl.erase(trl.begin() + i);
+                } else {
+                    DrawCircle(trl[i].x, trl[i].y, trl[i].size, Fade(WHITE, trl[i].alpha));
+                }
+            }
+
+            DrawLineEx(Vector2{mX - 130, mY + 60}, Vector2{mX + 130, mY + 20}, 6.0f, WHITE);
+            DrawTriangle(Vector2{mX - 110, mY + 55}, Vector2{mX - 170, mY + 80}, Vector2{mX - 160, mY + 40}, WHITE);
+
+            DrawTriangle(Vector2{mX, mY - 60}, Vector2{mX - 35, mY - 10}, Vector2{mX + 35, mY - 10}, WHITE);
+            DrawRectangle(mX - 45, mY - 12, 90, 8, WHITE);
+
+            DrawCircle(mX, mY + 15, 25, WHITE);
+
+            DrawRectangle(mX - 25, mY + 15, 45, 55, WHITE);
+
+            DrawTriangle(Vector2{mX - 30, mY + 110}, Vector2{mX, mY + 45}, Vector2{mX + 25, mY + 110}, WHITE);
+            DrawRectangle(mX - 20, mY + 50, 45, 50, WHITE);
+
+            DrawText("Watashi no kokoro mo shinteyuku no ka na", screenW / 2 - 180, screenH - 50, 18, LIGHTGRAY);
+
+        } else if (time >= 11.0f && time < 12.0f) {
+            inverted = true;
+            ClearBackground(BLACK);
+
+            if (!sI) {
+                sI = true;
+                shd.clear();
+                int cols = 5;
+                int rows = 4;
+                float cW = static_cast<float>(screenW) / cols;
+                float cH = static_cast<float>(screenH) / rows;
+                for (int r = 0; r < rows; r++) {
+                    for (int c = 0; c < cols; c++) {
+                        float cx = c * cW + cW / 2.0f;
+                        float cy = r * cH + cH / 2.0f;
+                        float dx = cx - (screenW / 2.0f);
+                        float dy = cy - (screenH / 2.0f);
+                        float ds = sqrt(dx*dx + dy*dy);
+                        if (ds == 0.0f) { ds = 1.0f; }
+                        float fc = 120.0f + (rand() % 80);
+                        float vx = (dx / ds) * fc;
+                        float vy = (dy / ds) * fc - 80.0f;
+
+                        shd.push_back(Shd{cx, cy, vx, vy, static_cast<float>(rand() % 360), static_cast<float>((rand() % 10 - 5)), cW * 0.7f});
+                        shd.push_back(Shd{cx + 10.0f, cy + 10.0f, vx + (rand() % 40 - 20), vy + (rand() % 40 - 20), static_cast<float>(rand() % 360), static_cast<float>((rand() % 10 - 5)), cW * 0.7f});
+                    }
+                }
+            }
+
+            for (auto& s : shd) {
+                s.vy += 300.0f * d;
+                s.x += s.vx * d;
+                s.y += s.vy * d;
+                s.angle += s.rotSpeed * d * 50.0f;
+
+                float a = s.angle * (3.14159f / 180.0f);
+                float a1 = a;
+                float a2 = a + 2.09439f;
+                float a3 = a + 4.18879f;
+
+                auto v1 = Vector2{s.x + cos(a1) * s.size, s.y + sin(a1) * s.size};
+                auto v2 = Vector2{s.x + cos(a2) * s.size, s.y + sin(a2) * s.size};
+                auto v3 = Vector2{s.x + cos(a3) * s.size, s.y + sin(a3) * s.size};
+
+                DrawTriangle(v1, v2, v3, WHITE);
+            }
+
+            DrawText("Futei na koto mo shitteyuku no ka na", screenW / 2 - 170, screenH - 50, 18, LIGHTGRAY);
+
+        } else {
+            ClearBackground(BLACK);
+
+            for (auto& p : ptl) {
+                p.y += p.speed;
+                p.x += sin(time * p.waveSpeed) * 1.2f;
+                p.angle += p.speed * 2.0f;
+                if (p.y > screenH) {
+                    p.y = -20;
+                    p.x = rand() % screenW;
+                }
+
+                float rad = p.angle * (3.14159f / 180.0f);
+                auto v1 = Vector2{p.x + cos(rad) * p.size, p.y + sin(rad) * p.size};
+                auto v2 = Vector2{p.x + cos(rad + 2.0f) * (p.size * 0.6f), p.y + sin(rad + 2.0f) * (p.size * 0.6f)};
+                auto v3 = Vector2{p.x + cos(rad - 2.0f) * (p.size * 0.6f), p.y + sin(rad - 2.0f) * (p.size * 0.6f)};
+                DrawTriangle(v1, v2, v3, WHITE);
+            }
+
+            DrawLineEx(Vector2{0, 0}, Vector2{120, 80}, 12.0f, DARKGRAY);
+            DrawLineEx(Vector2{120, 80}, Vector2{200, 110}, 8.0f, DARKGRAY);
+            DrawLineEx(Vector2{120, 80}, Vector2{160, 150}, 6.0f, DARKGRAY);
+            DrawLineEx(Vector2{0, 0}, Vector2{60, 120}, 8.0f, DARKGRAY);
+
+            DrawCircle(120, 80, 15, WHITE);
+            DrawCircle(130, 90, 12, WHITE);
+            DrawCircle(200, 110, 18, WHITE);
+            DrawCircle(160, 150, 14, WHITE);
+            DrawCircle(60, 120, 16, WHITE);
+
+            float fO = 1.0f;
+            if (time > 14.0f) {
+                fO = 1.0f - (time - 14.0f);
+            }
+
+            DrawText("BAD APPLE!!", screenW / 2 - 100, screenH / 2 - 40, 36, Fade(WHITE, fO));
+            DrawText("Cmp++ Engine Verification", screenW / 2 - 110, screenH / 2 + 10, 18, Fade(GRAY, fO));
+            DrawText("Thank you for watching!", screenW / 2 - 95, screenH / 2 + 40, 14, Fade(LIGHTGRAY, fO));
+
+            DrawText("Tada yudane teku dake no sono koto", screenW / 2 - 165, screenH - 50, 18, Fade(LIGHTGRAY, fO));
+        }
+
+        DrawRectangle(0, screenH - 70, screenW, 4, inverted ? WHITE : BLACK);
+        DrawText("BAD APPLE!! - Cmp++ High-Fidelity Demo", 15, 15, 14, GRAY);
+
+        EndDrawing();
+    }
+
+    return 0;
+}
+`
       }
     ],
     semantic: [
