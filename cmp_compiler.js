@@ -34,7 +34,11 @@ const CmpCompiler = {
     "fftw3.h": "fft",
     "tbb/tbb.h": "tbb",
     "catch2/catch_test_macros.hpp": "cat",
-    "llvm/IR/LLVMContext.h": "llvm"
+    "llvm/IR/LLVMContext.h": "llvm",
+    "opencv2/core.hpp": "ocv/core",
+    "opencv2/imgproc.hpp": "ocv/imgproc",
+    "opencv2/core/utils/logger.hpp": "ocv/logger",
+    "opencv2/videoio.hpp": "ocv/videoio"
   },
 
   // Reverse mapping of Cmp++ codes to C++ headers
@@ -65,7 +69,11 @@ const CmpCompiler = {
     "fft": "fftw3.h",
     "tbb": "tbb/tbb.h",
     "cat": "catch2/catch_test_macros.hpp",
-    "llvm": "llvm/IR/LLVMContext.h"
+    "llvm": "llvm/IR/LLVMContext.h",
+    "ocv/core": "opencv2/core.hpp",
+    "ocv/imgproc": "opencv2/imgproc.hpp",
+    "ocv/logger": "opencv2/core/utils/logger.hpp",
+    "ocv/videoio": "opencv2/videoio.hpp"
   },
 
   // Dictionary for semantic prompt translation (for prompt mode)
@@ -378,12 +386,30 @@ const CmpCompiler = {
         continue;
       }
 
-      // Main function
       if (trimmed.startsWith("i_m")) {
         let hasBrace = trimmed.includes("{") ? " {" : "";
         let mainMatch = trimmed.match(/^i_m\s*\(([^)]*)\)/);
         if (mainMatch) {
-          cppLines.push(indent + `int main(${mainMatch[1].trim()})${hasBrace}`);
+          let args = mainMatch[1].trim();
+          args = args
+            .replace(/\bc&/g, "const auto&")
+            .replace(/\bstr\b/g, "std::string")
+            .replace(/\bv\s*<\s*([^>]+)\s*>/g, "std::vector<$1>")
+            .replace(/\bsp\s*<\s*([^>]+)\s*>/g, "std::shared_ptr<$1>")
+            .replace(/\bup\s*<\s*([^>]+)\s*>/g, "std::unique_ptr<$1>")
+            .replace(/\bfl\b/g, "float")
+            .replace(/\bbl\b/g, "bool")
+            .replace(/\btr\b/g, "true")
+            .replace(/\bfs\b/g, "false")
+            .replace(/\bit\b/g, "int")
+            .replace(/\bvd\b/g, "void")
+            .replace(/\bdb\b/g, "double")
+            .replace(/\bch\b/g, "char");
+          for (let key in this.reverseContractionMap) {
+            let regex = new RegExp(`\\b${key}\\b`, 'g');
+            args = args.replace(regex, this.reverseContractionMap[key]);
+          }
+          cppLines.push(indent + `int main(${args})${hasBrace}`);
         } else {
           cppLines.push(indent + `int main()${hasBrace}`);
         }

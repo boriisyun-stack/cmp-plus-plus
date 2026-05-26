@@ -1,0 +1,154 @@
+#i io
+#i vec
+#i str
+#i fst
+#i thr
+#i chr
+#i ocv/core
+#i ocv/imgproc
+#i ocv/logger
+#i ocv/videoio
+
+st Chg {
+    short index
+    ch c
+}
+
+vd rdFr(cv::Mat &src, str &dest, const cv::Size &resize) {
+    const static str CH_LIST = []() {
+        std::ifstream charList("chars.txt")
+        str chars
+        ? (charList.is_open()) {
+            std::getline(charList, chars)
+        }
+        ? (chars.empty()) {
+            chars = " .'-:+=*#%@"
+        }
+        → chars
+    }()
+    const static it CHS = CH_LIST.size() - 1
+    cv::resize(src, src, resize)
+    auto pix = src.begin<cv::Vec3b>()
+    ⟳ (it row = 0, height = resize.height, width = resize.width; row < height; row++) {
+        ⟳ (it col = 0; col < width; col++, ++pix) {
+            dest.pb(CH_LIST[sc<it>(cv::mean(*pix)[0] * CHS / 255)])
+        }
+    }
+}
+
+i_m(it argc, ch **argv) {
+    ? (argc <= 1) {
+        out << "Usage: badapple videoFile consoleWidthInChars\n"
+        → 0
+    }
+
+    namespace sch = std::chrono
+    using sc_t = sch::steady_clock
+
+    const long long FD = 1e6 / 15
+
+    cv::utils::logging::setLogLevel(cv::utils::logging::LogLevel::LOG_LEVEL_SILENT)
+
+    cv::VideoCapture badAppleVid(argv[1])
+
+    ? (!badAppleVid.isOpened()) {
+        out << "Could not open file " << argv[1] << el
+        → -1
+    }
+
+    const it C_W = atoi(argv[2])
+    const it V_W = sc<it>(badAppleVid.get(cv::CAP_PROP_FRAME_WIDTH))
+    const it V_H = sc<it>(badAppleVid.get(cv::CAP_PROP_FRAME_HEIGHT))
+    const it V_W_C = C_W
+    const it V_H_C = V_H * C_W / (V_W * 2)
+    const it F_S = sc<it>(badAppleVid.get(cv::CAP_PROP_FPS) / 15)
+    const it T_F = sc<it>(badAppleVid.get(cv::CAP_PROP_FRAME_COUNT) / F_S)
+    const auto C_F_S = cv::Size(V_W_C, V_H_C)
+
+    std::vector<std::vector<Chg>> changes
+    cv::Mat vidFrame
+    str firstFrame
+
+    badAppleVid >> vidFrame
+    rdFr(vidFrame, firstFrame, C_F_S)
+
+    ⟳ (it i = 0; i < F_S; i++) {
+        badAppleVid >> vidFrame
+    }
+
+    str lastFrame = firstFrame
+    it frameCount = 1
+    it lastProgressMod = 0
+    ⟲ (!vidFrame.empty()) {
+        changes.pb(v<Chg>())
+        str thisFrame
+        rdFr(vidFrame, thisFrame, C_F_S)
+
+        auto &thisChanges = changes.back()
+        ⟳ (it i = 0; i < sc<it>(thisFrame.length()); i++) {
+            ? (thisFrame[i] != lastFrame[i]) {
+                thisChanges.pb(Chg{(short)i, thisFrame[i]})
+            }
+        }
+        lastFrame = thisFrame
+
+        ⟳ (it i = 0; i < F_S; i++) {
+            badAppleVid >> vidFrame
+        }
+
+        const it progress = ++frameCount * 100 / T_F
+        ? (progress % 10 == 0 && progress / 10 != lastProgressMod) {
+            lastProgressMod = progress / 10
+            out << progress << "%\n"
+        }
+    }
+
+    out << "Done processing!\n"
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500))
+
+    out << "\033[2J\033[H" << std::flush
+    out << firstFrame << std::flush
+
+    it frame = 0
+    auto before = sc_t::now()
+    lastFrame = firstFrame
+    ⟲ (frame < T_F - 1) {
+        auto after = sc_t::now()
+        auto dtVal = sch::duration_cast<sch::microseconds>(after - before).count()
+
+        bl drawNewFrame = fs
+        ? (dtVal >= FD) {
+            drawNewFrame = tr
+            before = after
+        }
+
+        it numFramesGoThrough = 0
+        ⟲ (dtVal >= FD) {
+            dtVal -= FD
+            numFramesGoThrough++
+            frame++
+            ? (frame >= T_F) {
+                break
+            }
+        }
+
+        ? (drawNewFrame) {
+            before -= sch::microseconds(dtVal)
+            it startFrame = frame - numFramesGoThrough
+            str buffer = lastFrame
+
+            ⟳ (it i = startFrame; i < frame; i++) {
+                ⟳ (c& change : changes[i]) {
+                    buffer[change.index] = change.c
+                }
+            }
+            lastFrame = buffer
+
+            out << "\033[H" << buffer << std::flush
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1))
+    }
+
+    out << "\033[2J\033[HThe End\n"
+    → 0
+}

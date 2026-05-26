@@ -155,6 +155,9 @@ function main() {
   if (cppSource.includes("#include <llvm/") || cmpSource.includes("#i llvm")) {
     linkFlags += " $(llvm-config --cxxflags --ldflags --libs)";
   }
+  if (cppSource.includes("#include <opencv2/") || cmpSource.includes("#i ocv")) {
+    linkFlags += " -I/opt/homebrew/include/opencv4 -L/opt/homebrew/lib -lopencv_core -lopencv_imgproc -lopencv_videoio -lopencv_video";
+  }
   
   const compileCmd = `g++ -std=c++17 "${cppFile}" -o "${outputBinary}"${linkFlags}`;
   
