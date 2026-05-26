@@ -22,9 +22,10 @@ Usage:
   node cmppp.js <file.cmp> [options]
 
 Options:
-  -r, -run    Compile and run the program immediately
-  -o <name>   Specify output binary name (defaults to input file base name)
-  -h, -help   Print this help menu
+  -r, -run      Compile and run the program immediately
+  -w, -web      Run in browser-based Web Sandbox (g++-free)
+  -o <name>     Specify output binary name (defaults to input file base name)
+  -h, -help     Print this help menu
   `);
 }
 
@@ -66,6 +67,9 @@ function main() {
 
   // Parse Run flag
   const shouldRun = args.includes('-r') || args.includes('-run');
+  
+  // Parse Web Sandbox flag
+  const forceWeb = args.includes('-w') || args.includes('-web') || args.includes('-sandbox');
 
   // Read .cmp source
   const cmpSource = fs.readFileSync(inputFile, 'utf-8');
@@ -86,6 +90,41 @@ function main() {
   console.log(`Cmp++ Code:    \x1b[36m${stats.cmp.tokens} tokens\x1b[0m (${stats.cmp.chars} chars)`);
   console.log(`Token Savings: \x1b[1m\x1b[32m${stats.reduction.tokens}%\x1b[0m (${stats.reduction.chars}% character reduction)`);
   console.log(`======================================\n`);
+
+  // Check if g++ is installed on the system
+  let compilerFound = true;
+  try {
+    const checkCmd = process.platform === 'win32' ? 'where g++' : 'which g++';
+    execSync(checkCmd, { stdio: 'ignore' });
+  } catch (e) {
+    compilerFound = false;
+  }
+
+  if (!compilerFound || forceWeb) {
+    if (forceWeb) {
+      console.log(`\n\x1b[35m[3/4] Launching the Cmp++ Web Sandbox to run "${inputFile}" in g++-free mode...\x1b[0m`);
+    } else {
+      console.log(`\n\x1b[33m[Warning] g++ compiler not found on your system. Running in g++-free mode...\x1b[0m`);
+      console.log(`\x1b[35m[3/4] Launching the Cmp++ Web Sandbox to run "${inputFile}" without g++...\x1b[0m`);
+    }
+    
+    // Write playground_code.js in Cwd so index.html can load it
+    const escapedCode = cmpSource.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\${/g, '\\${');
+    fs.writeFileSync(path.join(__dirname, 'playground_code.js'), `window.PLAYGROUND_CODE = \`${escapedCode}\`;`, 'utf-8');
+    
+    let openCmd = "";
+    if (process.platform === 'darwin') openCmd = 'open index.html';
+    else if (process.platform === 'win32') openCmd = 'start index.html';
+    else openCmd = 'xdg-open index.html';
+    
+    try {
+      execSync(openCmd, { cwd: __dirname });
+      console.log(`\x1b[1m\x1b[32m[4/4] Web Sandbox launched successfully! Enjoy the game in your browser.\x1b[0m`);
+    } catch (e) {
+      console.error(`\x1b[31mError: Could not open browser automatically. Please open "${path.join(__dirname, 'index.html')}" manually.\x1b[0m`);
+    }
+    process.exit(0);
+  }
 
   // Compile with system g++ (C++17)
   console.log(`\x1b[35m[3/4] Compiling standard C++ via g++...\x1b[0m`);

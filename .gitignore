@@ -12,6 +12,7 @@ a.out
 main.cpp
 snake.cpp
 badapple.cpp
+playground_code.js
 
 # OS files
 .DS_Store

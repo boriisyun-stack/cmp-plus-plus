@@ -181,19 +181,26 @@ const CmpCompiler = {
         // Constants
         .replace(/\bnullptr\b/g, "Ø")
         // Functions
-        .replace(/\brand\b/g, "ran")
+        .replace(/\brand\s*\(/g, "ran(")
+        .replace(/\bstd::to_string\s*\(/g, "to_str(")
+        .replace(/\bto_string\s*\(/g, "to_str(")
         // Raylib shorthand
-        .replace(/\bInitWindow\b/g, "init_w")
-        .replace(/\bWindowShouldClose\b/g, "w_close")
-        .replace(/\bBeginDrawing\b/g, "draw_b")
-        .replace(/\bEndDrawing\b/g, "draw_e")
-        .replace(/\bClearBackground\b/g, "bg_cls")
-        .replace(/\bDrawRectangle\b/g, "draw_rect")
-        .replace(/\bDrawCircle\b/g, "draw_circ")
-        .replace(/\bDrawText\b/g, "draw_txt")
-        .replace(/\bIsKeyPressed\b/g, "key_p")
-        .replace(/\bIsKeyDown\b/g, "key_d")
-        .replace(/\bSetTargetFPS\b/g, "set_fps")
+        .replace(/\bInitWindow\s*\(/g, "init_w(")
+        .replace(/\bWindowShouldClose\s*\(/g, "w_close(")
+        .replace(/\bBeginDrawing\s*\(/g, "draw_b(")
+        .replace(/\bEndDrawing\s*\(/g, "draw_e(")
+        .replace(/\bClearBackground\s*\(/g, "bg_cls(")
+        .replace(/\bDrawRectangle\s*\(/g, "rect(")
+        .replace(/\bDrawCircle\s*\(/g, "circ(")
+        .replace(/\bDrawText\s*\(/g, "text(")
+        .replace(/\bIsKeyPressed\s*\(/g, "key_p(")
+        .replace(/\bIsKeyDown\s*\(/g, "key_d(")
+        .replace(/\bSetTargetFPS\s*\(/g, "set_fps(")
+        .replace(/\bDrawLineEx\s*\(/g, "line(")
+        .replace(/\bDrawTriangle\s*\(/g, "tri(")
+        .replace(/\bDrawCircleSector\s*\(/g, "sect(")
+        .replace(/\bGetFrameTime\s*\(/g, "dt(")
+        .replace(/\bFade\s*\(/g, "fade(")
         // Actions
         .replace(/\.push_back\b/g, ".pb")
         .replace(/\bsort\(([^.]+)\.begin\(\),\s*\1\.end\(\)\)/g, "srt($1)")
@@ -222,17 +229,30 @@ const CmpCompiler = {
     let lines = cmpCode.split("\n");
     let cppLines = [];
     let hasHeader = false;
+    let inStruct = false;
+    let structBraceCount = 0;
 
     for (let line of lines) {
       let trimmed = line.trim();
       let indent = line.match(/^\s*/)[0];
+      
+      if (trimmed.startsWith("struct ")) {
+        inStruct = true;
+        structBraceCount = 0;
+      }
+      if (inStruct) {
+        for (let char of trimmed) {
+          if (char === '{') structBraceCount++;
+          if (char === '}') structBraceCount--;
+        }
+      }
       if (!trimmed) {
         cppLines.push("");
         continue;
       }
 
       // Handle comments
-      if (trimmed.startsWith("#") && !trimmed.startsWith("#i")) {
+      if (trimmed.startsWith("#") && !trimmed.startsWith("#i ")) {
         cppLines.push(indent + "// " + trimmed.substring(1).trim());
         continue;
       }
@@ -311,19 +331,25 @@ const CmpCompiler = {
         .replace(/\bup\s*<\s*([^>]+)\s*>/g, "std::unique_ptr<$1>")
         .replace(/\bfl\b/g, "float")
         // Functions
-        .replace(/\bran\b/g, "rand")
+        .replace(/\bran\s*\(/g, "rand(")
+        .replace(/\bto_str\s*\(/g, "std::to_string(")
         // Raylib shorthand back to standard
-        .replace(/\binit_w\b/g, "InitWindow")
-        .replace(/\bw_close\b/g, "WindowShouldClose")
-        .replace(/\bdraw_b\b/g, "BeginDrawing")
-        .replace(/\bdraw_e\b/g, "EndDrawing")
-        .replace(/\bbg_cls\b/g, "ClearBackground")
-        .replace(/\bdraw_rect\b/g, "DrawRectangle")
-        .replace(/\bdraw_circ\b/g, "DrawCircle")
-        .replace(/\bdraw_txt\b/g, "DrawText")
-        .replace(/\bkey_p\b/g, "IsKeyPressed")
-        .replace(/\bkey_d\b/g, "IsKeyDown")
-        .replace(/\bset_fps\b/g, "SetTargetFPS")
+        .replace(/\binit_w\s*\(/g, "InitWindow(")
+        .replace(/\bw_close\s*\(/g, "WindowShouldClose(")
+        .replace(/\bdraw_b\s*\(/g, "BeginDrawing(")
+        .replace(/\bdraw_e\s*\(/g, "EndDrawing(")
+        .replace(/\bbg_cls\s*\(/g, "ClearBackground(")
+        .replace(/\brect\s*\(/g, "DrawRectangle(")
+        .replace(/\bcirc\s*\(/g, "DrawCircle(")
+        .replace(/\btext\s*\(/g, "DrawText(")
+        .replace(/\bkey_p\s*\(/g, "IsKeyPressed(")
+        .replace(/\bkey_d\s*\(/g, "IsKeyDown(")
+        .replace(/\bset_fps\s*\(/g, "SetTargetFPS(")
+        .replace(/\bline\s*\(/g, "DrawLineEx(")
+        .replace(/\btri\s*\(/g, "DrawTriangle(")
+        .replace(/\bsect\s*\(/g, "DrawCircleSector(")
+        .replace(/\bdt\s*\(/g, "GetFrameTime(")
+        .replace(/\bfade\s*\(/g, "Fade(")
         // Actions
         .replace(/\.pb\b/g, ".push_back")
         .replace(/\bsrt\(([^)]+)\)/g, "std::sort($1.begin(), $1.end())")
@@ -362,6 +388,13 @@ const CmpCompiler = {
         decompiled += ";";
       }
 
+      if (inStruct && structBraceCount <= 0) {
+        if (!decompiled.endsWith(";")) {
+          decompiled += ";";
+        }
+        inStruct = false;
+      }
+
       cppLines.push(indent + decompiled);
     }
 
@@ -371,6 +404,138 @@ const CmpCompiler = {
     }
 
     return cppLines.join("\n");
+  },
+
+  // 2.5. CMP++ TO JAVASCRIPT TRANSPILER (For Running Without g++)
+  transpileToJS: function(cmpCode) {
+    if (!cmpCode) return "";
+    let lines = cmpCode.split("\n");
+    let setupLines = [];
+    let loopLines = [];
+    let isInsideLoop = false;
+    let braceCount = 0;
+    
+    // Parse struct definitions first to map object constructs
+    let structFields = {};
+    let structRegex = /struct\s+(\w+)\s*\{([^}]+)\}/g;
+    let match;
+    let cleanCode = cmpCode;
+    while ((match = structRegex.exec(cmpCode)) !== null) {
+      let name = match[1];
+      let body = match[2];
+      let fields = [];
+      let fieldRegex = /\b\w+\s+(\w+);/g;
+      let fMatch;
+      while ((fMatch = fieldRegex.exec(body)) !== null) {
+        fields.push(fMatch[1]);
+      }
+      structFields[name] = fields;
+    }
+    
+    // Clean struct declarations from execution lines
+    cleanCode = cleanCode.replace(/struct\s+\w+\s*\{[^}]+\};?/g, '');
+    
+    lines = cleanCode.split('\n');
+    for (let line of lines) {
+      let trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      
+      if (trimmed.includes('i_m') || trimmed.includes('int main')) {
+        continue;
+      }
+      
+      // Match the main Raylib while loop
+      if (trimmed.match(/^(⟲|while)\s*\(!?w_close\(\)\)/)) {
+        isInsideLoop = true;
+        braceCount = 1;
+        continue;
+      }
+      
+      if (isInsideLoop) {
+        for (let char of trimmed) {
+          if (char === '{') braceCount++;
+          if (char === '}') braceCount--;
+        }
+        if (braceCount <= 0) {
+          isInsideLoop = false;
+          continue;
+        }
+        loopLines.push(line);
+      } else {
+        if (trimmed === '}' && setupLines.length > 5 && !trimmed.includes('{')) {
+          continue;
+        }
+        setupLines.push(line);
+      }
+    }
+    
+    let transpileLine = (line) => {
+      let js = line
+        .replace(/\bint\s+/g, 'let ')
+        .replace(/\bfloat\s+/g, 'let ')
+        .replace(/\bfl\s+/g, 'let ')
+        .replace(/\bbool\s+/g, 'let ')
+        .replace(/\bdouble\s+/g, 'let ')
+        .replace(/\bauto\s+/g, 'let ')
+        .replace(/\bstr\s+/g, 'let ')
+        .replace(/\bstd::string\s+/g, 'let ')
+        .replace(/\bv\s*<\s*[^>]+\s*>\s*(\w+)/g, 'let $1 = []')
+        .replace(/\bstd::vector\s*<\s*[^>]+\s*>\s*(\w+)/g, 'let $1 = []')
+        .replace(/⟳/g, 'for')
+        .replace(/⟲/g, 'while')
+        .replace(/\?/g, 'if')
+        .replace(/\|/g, 'else')
+        .replace(/→/g, 'return')
+        .replace(/for\s*\(([^:]+):([^)]+)\)/g, (m, left, right) => {
+          let varName = left.trim().split(/\s+/).pop().replace(/[&*]/g, '');
+          return `for (let ${varName} of ${right.trim()})`;
+        })
+        .replace(/\.pb\s*\(/g, '.push(')
+        .replace(/\.clear\s*\(\)/g, '.length = 0')
+        .replace(/\.size\s*\(\)/g, '.length')
+        .replace(/(\w+)\.back\(\)/g, '$1[$1.length - 1]')
+        .replace(/\bsc\s*<\s*[^>]+\s*>\s*\(([^)]+)\)/g, 'Number($1)')
+        .replace(/\bstatic_cast\s*<\s*[^>]+\s*>\s*\(([^)]+)\)/g, 'Number($1)')
+        .replace(/\bstd::to_string\b/g, 'String')
+        .replace(/\bto_str\b/g, 'String')
+        .replace(/\.c_str\(\)/g, '')
+        .replace(/\bran\s*\(\)/g, 'Math.floor(Math.random() * 32768)')
+        .replace(/\brand\s*\(\)/g, 'Math.floor(Math.random() * 32768)')
+        .replace(/\bcos\b/g, 'Math.cos')
+        .replace(/\bsin\b/g, 'Math.sin')
+        .replace(/Vector2\s*\{\s*([^,]+)\s*,\s*([^}]+)\}/g, '{x: $1, y: $2}')
+        .replace(/Ø/g, 'null');
+        
+      for (let sName in structFields) {
+        let fields = structFields[sName];
+        let regex = new RegExp(`\\b${sName}\\s*\\{([^}]+)\\}`, 'g');
+        js = js.replace(regex, (m, argsStr) => {
+          let args = argsStr.split(',').map(a => a.trim());
+          let objStr = '{';
+          for (let i = 0; i < fields.length; i++) {
+            objStr += `${fields[i]}: ${args[i] || '0'}${i < fields.length - 1 ? ', ' : ''}`;
+          }
+          objStr += '}';
+          return objStr;
+        });
+      }
+      return js;
+    };
+    
+    let compiledSetup = setupLines.map(transpileLine).join('\n');
+    let compiledLoop = loopLines.map(transpileLine).join('\n');
+    
+    return `
+(function() {
+  // Struct instantiations & Setup
+  ${compiledSetup}
+  
+  // Game Loop Tick function
+  window._raylibTick = function() {
+    ${compiledLoop}
+  };
+})();
+    `;
   },
 
   // 3. SEMANTIC COMPRESSION (Prompt Mode)

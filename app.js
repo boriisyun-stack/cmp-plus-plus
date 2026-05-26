@@ -212,6 +212,216 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // === RAYLIB HTML5 EMULATOR & WEB SANDBOX RUNNER ===
+  let animationFrameId = null;
+  let canvas = null;
+  let ctx = null;
+  let keysDown = {};
+  let keysPressed = {};
+  let shouldClose = false;
+  let frameTime = 0.016;
+
+  // Global variables to match Cmp++ standard constants
+  window.BLACK = 'black';
+  window.WHITE = 'white';
+  window.RED = 'red';
+  window.GREEN = 'green';
+  window.LIME = 'lime';
+  window.DARKGRAY = 'darkgray';
+  window.LIGHTGRAY = 'lightgray';
+  window.GRAY = 'gray';
+
+  window.KEY_RIGHT = 'ArrowRight';
+  window.KEY_LEFT = 'ArrowLeft';
+  window.KEY_UP = 'ArrowUp';
+  window.KEY_DOWN = 'ArrowDown';
+  window.KEY_SPACE = ' ';
+
+  // Raylib emulator functions
+  window.init_w = function(w, h, title) {
+    canvas = document.getElementById('raylib-canvas');
+    canvas.width = w;
+    canvas.height = h;
+    ctx = canvas.getContext('2d');
+    shouldClose = false;
+  };
+
+  window.set_fps = function(fps) {
+    // RequestAnimationFrame handles refresh rate natively
+  };
+
+  window.w_close = function() {
+    return shouldClose;
+  };
+
+  window.draw_b = function() {};
+  window.draw_e = function() {};
+
+  window.bg_cls = function(color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  };
+
+  window.rect = function(x, y, w, h, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, w, h);
+  };
+
+  window.circ = function(x, y, r, color) {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill();
+  };
+
+  window.text = function(t, x, y, size, color) {
+    ctx.font = `${size}px monospace`;
+    ctx.fillStyle = color;
+    ctx.fillText(t, x, y + size * 0.85);
+  };
+
+  window.line = function(v1, v2, thick, color) {
+    ctx.beginPath();
+    ctx.moveTo(v1.x, v1.y);
+    ctx.lineTo(v2.x, v2.y);
+    ctx.lineWidth = thick;
+    ctx.strokeStyle = color;
+    ctx.stroke();
+  };
+
+  window.tri = function(v1, v2, v3, color) {
+    ctx.beginPath();
+    ctx.moveTo(v1.x, v1.y);
+    ctx.lineTo(v2.x, v2.y);
+    ctx.lineTo(v3.x, v3.y);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+  };
+
+  window.sect = function(center, radius, startAngle, endAngle, segments, color) {
+    ctx.beginPath();
+    ctx.moveTo(center.x, center.y);
+    ctx.arc(center.x, center.y, radius, startAngle * Math.PI / 180, endAngle * Math.PI / 180);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+  };
+
+  window.dt = function() {
+    return frameTime;
+  };
+
+  window.fade = function(color, alpha) {
+    if (color === 'black') return `rgba(0,0,0,${alpha})`;
+    if (color === 'white') return `rgba(255,255,255,${alpha})`;
+    if (color === 'red') return `rgba(255,0,0,${alpha})`;
+    if (color === 'green') return `rgba(0,128,0,${alpha})`;
+    if (color === 'lime') return `rgba(0,255,0,${alpha})`;
+    if (color === 'darkgray') return `rgba(169,169,169,${alpha})`;
+    if (color === 'lightgray') return `rgba(211,211,211,${alpha})`;
+    if (color === 'gray') return `rgba(128,128,128,${alpha})`;
+    return color;
+  };
+
+  window.key_p = function(k) {
+    return !!keysPressed[k];
+  };
+
+  window.key_d = function(k) {
+    return !!keysDown[k];
+  };
+
+  let keysListenerAttached = false;
+  function setupKeyListeners() {
+    if (keysListenerAttached) return;
+    window.addEventListener('keydown', (e) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+        e.preventDefault(); // Prevent page scrolling
+      }
+      keysDown[e.key] = true;
+      keysPressed[e.key] = true;
+    });
+    window.addEventListener('keyup', (e) => {
+      keysDown[e.key] = false;
+    });
+    keysListenerAttached = true;
+  }
+
+  const sandboxModal = document.getElementById('sandbox-modal');
+  const runSandboxBtn = document.getElementById('run-sandbox-btn');
+  const closeSandboxBtn = document.getElementById('close-sandbox-btn');
+
+  function runWebSandbox() {
+    if (!editorOutput.value) {
+      performCompilation();
+    }
+    const cmpCode = editorOutput.value;
+    if (!cmpCode) return;
+
+    sandboxModal.classList.remove('hidden');
+
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+    }
+
+    let jsCode;
+    try {
+      jsCode = CmpCompiler.transpileToJS(cmpCode);
+    } catch (err) {
+      console.error(err);
+      alert("Error transpiling to JS: " + err.message);
+      return;
+    }
+
+    setupKeyListeners();
+    keysPressed = {};
+    shouldClose = false;
+
+    try {
+      eval(jsCode);
+    } catch (err) {
+      console.error(err);
+      alert("Runtime Error: " + err.message);
+      return;
+    }
+
+    let lastTime = performance.now();
+    function tick(now) {
+      frameTime = (now - lastTime) / 1000;
+      if (frameTime > 0.1) frameTime = 0.016;
+      lastTime = now;
+
+      if (window._raylibTick) {
+        try {
+          window._raylibTick();
+        } catch (e) {
+          console.error(e);
+          return;
+        }
+      }
+
+      keysPressed = {};
+
+      if (!shouldClose) {
+        animationFrameId = requestAnimationFrame(tick);
+      }
+    }
+    animationFrameId = requestAnimationFrame(tick);
+  }
+
+  function stopWebSandbox() {
+    shouldClose = true;
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+    sandboxModal.classList.add('hidden');
+  }
+
+  runSandboxBtn.addEventListener('click', runWebSandbox);
+  closeSandboxBtn.addEventListener('click', stopWebSandbox);
+
   const copyBtn = document.getElementById("copy-btn");
   copyBtn.addEventListener("click", () => {
     const copyText = editorOutput.value;
@@ -233,4 +443,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize
   setMode("code");
+
+  // Check for preloaded CLI code
+  if (window.PLAYGROUND_CODE) {
+    editorOutput.value = window.PLAYGROUND_CODE;
+    editorInput.value = CmpCompiler.decompileCode(window.PLAYGROUND_CODE);
+    updateAnalysis();
+    setTimeout(() => {
+      runWebSandbox();
+    }, 500);
+  }
 });
