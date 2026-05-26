@@ -117,8 +117,18 @@ const CmpTokenizer = {
     const origChars = originalText.length;
     const cmpChars = cmpText.length;
     
-    const origBytes = new Blob([originalText]).size;
-    const cmpBytes = new Blob([cmpText]).size;
+    let origBytes = 0;
+    let cmpBytes = 0;
+    if (typeof Buffer !== 'undefined') {
+      origBytes = Buffer.byteLength(originalText);
+      cmpBytes = Buffer.byteLength(cmpText);
+    } else if (typeof Blob !== 'undefined') {
+      origBytes = new Blob([originalText]).size;
+      cmpBytes = new Blob([cmpText]).size;
+    } else {
+      origBytes = originalText.length;
+      cmpBytes = cmpText.length;
+    }
     
     const tokenReduction = origTokens > 0 ? ((origTokens - cmpTokens) / origTokens) * 100 : 0;
     const charReduction = origChars > 0 ? ((origChars - cmpChars) / origChars) * 100 : 0;
